@@ -1152,3 +1152,34 @@ footer strong {
   .metrics-ribbon { grid-template-columns: 1fr 1fr; }
   .hud-nav { display: none; }
 }
+
+/* ================= MOBILE NAVIGATION FIX ================= */
+@media (max-width: 768px) {
+  .cyber-hud {
+    flex-direction: column;
+    padding: 10px 12px;
+    height: auto;
+  }
+
+  .hud-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 0;
+    width: 100%;
+  }
+
+  .hud-nav a {
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    display: inline-block;
+    white-space: nowrap;
+    touch-action: manipulation; /* Memastikan sentuhan jari responsif */
+  }
+
+  /* Pastikan kanvas tidak menghalang sentuhan link */
+  #particle-canvas {
+    pointer-events: none;
+  }
+}
