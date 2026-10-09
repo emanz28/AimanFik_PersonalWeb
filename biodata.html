@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biodata - emann.SYS | IMD318</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= VEEMON PARTNER COMPONENT STYLES ================= */
+    .robot-section {
+      display: flex;
+      justify-content: center;
+      margin: 25px auto 35px;
+      width: 100%;
+    }
+
+    .robot-card {
+      position: relative;
+      background: rgba(4, 8, 20, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      width: 100%;
+      max-width: 520px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .veemon-container {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .veemon-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      animation: veemonIdle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes veemonIdle {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* Animasi apabila Veemon sedang bercakap / audio aktif */
+    .speaking .veemon-img {
+      animation: veemonTalkBounce 0.35s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px var(--neon-cyan)) brightness(1.2);
+    }
+
+    @keyframes veemonTalkBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px) scale(1.08); }
+    }
+
+    .system-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 5px 0 10px;
+    }
+
+    .mouth-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 24px;
+      margin: 4px auto 14px;
+      width: 140px;
+    }
+
+    .mouth-viz span {
+      width: 4px;
+      height: 5px;
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .speaking .mouth-viz span {
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: soundWave 0.45s ease-in-out infinite alternate;
+    }
+
+    .speaking .mouth-viz span:nth-child(2) { animation-delay: 0.1s; }
+    .speaking .mouth-viz span:nth-child(3) { animation-delay: 0.2s; }
+    .speaking .mouth-viz span:nth-child(4) { animation-delay: 0.05s; }
+    .speaking .mouth-viz span:nth-child(5) { animation-delay: 0.25s; }
+    .speaking .mouth-viz span:nth-child(6) { animation-delay: 0.15s; }
+    .speaking .mouth-viz span:nth-child(7) { animation-delay: 0.3s; }
+    .speaking .mouth-viz span:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes soundWave {
+      0% { height: 4px; }
+      100% { height: 22px; }
+    }
+
+    .transcript-box {
+      background: #02050c;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      text-align: left;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .robot-btn {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .robot-btn:hover:not(:disabled) {
+      background: var(--neon-cyan);
+      color: #03060f;
+      box-shadow: 0 0 16px var(--neon-cyan);
+    }
+
+    .robot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body id="top">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Top Cyber HUD Header -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign"><span class="status-dot"></span> emann.SYS</div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+    <nav class="hud-nav">
+      <a href="index.html">00 // HOME</a>
+      <a href="biodata.html" class="active">01 // BIODATA</a>
+      <a href="education.html">02 // EDUCATION</a>
+      <a href="experience.html">03 // EXPERIENCE</a>
+      <a href="family.html">04 // FAMILY</a>
+      <a href="gallery.html">05 // GALLERY</a>
+    </nav>
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">🔊 SFX: ON</button>
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <main class="container" id="bio-content" style="margin-top: 40px;">
+    <h2>01 // BIOMETRIC DOSSIER &amp; PROFILE</h2>
+    <hr>
+
+    <p>
+      A highly motivated and disciplined student with a demonstrated record in leadership, 
+      academics, and co-curricular excellence. Committed to making a positive impact through 
+      service, technical innovation, creative media, and collaborative teamwork.
+    </p>
+
+    <!-- ========================================================
+         VEEMON DIGITAL PARTNER AUDIO INTERFACE
+         ======================================================== -->
+    <section class="robot-section">
+      <div class="robot-card" id="robotCard">
+        <!-- Avatar Veemon Menggunakan fail tempatan veemon.gif -->
+        <div class="veemon-container">
+          <img src="veemon.gif" alt="Veemon Partner" class="veemon-img" id="veemonSprite">
+        </div>
+
+        <div class="system-title">V-MON // DIGITAL PARTNER INTERFACE</div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusLabel">Standby</span>
+        </div>
+
+        <!-- Audio Wave Visualizer Bars -->
+        <div class="mouth-viz">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Vocal Transcript Box -->
+        <div class="transcript-box" id="transcript">
+          "System ready. Press 'Transmit Briefing' to begin vocal audio telemetry."
+        </div>
+
+        <div class="actions">
+          <button type="button" class="robot-btn" id="speakBtn" onclick="activateRobotSpeech()">Transmit Briefing</button>
+          <button type="button" class="robot-btn" id="stopBtn" onclick="haltRobotSpeech()" disabled>Silence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         CYBER PROFILE PHOTO SLIDESHOW (3 GAMBAR BERBEZA)
+         ======================================================== -->
+    <section class="slideshow-wrapper">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <button class="slide-btn prev" onclick="changeSlide(-1)">❮</button>
+      <button class="slide-btn next" onclick="changeSlide(1)">❯</button>
+
+      <div class="slideshow-frame">
+        <!-- Gambar 1 Biodata -->
+        <div class="slide-item active">
+          <img src="bio1.jpg" alt="Aiman Asman Photo 1" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <!-- Gambar 2 Biodata -->
+        <div class="slide-item">
+          <img src="bio2.jpg" alt="Aiman Asman Photo 2" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <!-- Gambar 3 Biodata -->
+        <div class="slide-item">
+          <img src="bio3.jpg" alt="Aiman Asman Photo 3" onerror="this.src='EMANZER.jpg'">
+        </div>
+      </div>
+
+      <div class="slide-controls">
+        <span id="slide-caption">IMAGE NODE: [01 / 03]</span>
+        <div class="slide-dots">
+          <span class="dot-indicator active" onclick="jumpToSlide(0)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(1)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(2)"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rubric Item 5: Complex Table (Rowspan & Colspan) -->
+    <h3 style="margin-top: 30px;">Biometric Profile Index</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Classification</th>
+          <th>Attribute Node</th>
+          <th>Registered Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="6"><b>Identity Parameters</b></td>
+          <td>Legal Name</td>
+          <td>Aiman Bin Asman</td>
+        </tr>
+        <tr>
+          <td>Nickname / Callsign</td>
+          <td>Eman / Boboy</td>
+        </tr>
+        <tr>
+          <td>Date of Birth</td>
+          <td>28 August 2006</td>
+        </tr>
+        <tr>
+          <td>Faculty / Program</td>
+          <td>Faculty of Information Science &ndash; CDIM110</td>
+        </tr>
+        <tr>
+          <td>Academic Node</td>
+          <td>Universiti Teknologi MARA (UiTM) Kampus Samarahan</td>
+        </tr>
+        <tr>
+          <td>Current Standing</td>
+          <td><b>Semester <sub>5</sub></b> | Current CGPA: <b>3.28</b><sup>(Cumulative)</sup></td>
+        </tr>
+        <tr>
+          <td rowspan="4"><b>Transmission Nodes</b></td>
+          <td>Contact Phone</td>
+          <td>+60 19-819 3560</td>
+        </tr>
+        <tr>
+          <td>Student Email</td>
+          <td><a href="mailto:2024647386@student.uitm.edu.my" style="color: var(--neon-cyan); text-decoration: none;">2024647386@student.uitm.edu.my</a></td>
+        </tr>
+        <tr>
+          <td>Personal Email</td>
+          <td><a href="mailto:aimanfik4647@gmail.com" style="color: var(--neon-cyan); text-decoration: none;">aimanfik4647@gmail.com</a></td>
+        </tr>
+        <tr>
+          <td>Origin Base</td>
+          <td>Kota Marudu, Sabah, Malaysia</td>
+        </tr>
+        <tr>
+          <td colspan="2"><b>Curricular Directive</b></td>
+          <td style="color:var(--neon-green); font-weight:bold;">IMD318 Web Content Management &amp; Design (Active Assessment)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CYBER SKILL MATRIX (NEON PROGRESS BARS) -->
+    <h3 style="margin-top: 35px;">Technical Competencies &amp; Skill Matrix</h3>
+    <section class="highlight-box">
+      <!-- Skill 1 -->
+      <div style="margin-bottom: 16px;">
+        <div style="display:flex; justify-content:space-between; font-family:'Fira Code', monospace; font-size:0.8rem; margin-bottom:5px;">
+          <span>CANVA GRAPHIC &amp; EDITORIAL DESIGN</span>
+          <span style="color:var(--neon-cyan);">92%</span>
+        </div>
+        <div style="width:100%; background:rgba(255,255,255,0.08); height:7px; border-radius:4px; overflow:hidden;">
+          <div style="width:92%; height:100%; background:var(--neon-cyan); box-shadow:0 0 10px var(--neon-cyan);"></div>
+        </div>
+      </div>
+
+      <!-- Skill 2 -->
+      <div style="margin-bottom: 16px;">
+        <div style="display:flex; justify-content:space-between; font-family:'Fira Code', monospace; font-size:0.8rem; margin-bottom:5px;">
+          <span>VIDEO PRODUCTION &amp; POST-EDITING (CAPCUT)</span>
+          <span style="color:var(--neon-purple);">88%</span>
+        </div>
+        <div style="width:100%; background:rgba(255,255,255,0.08); height:7px; border-radius:4px; overflow:hidden;">
+          <div style="width:88%; height:100%; background:var(--neon-purple); box-shadow:0 0 10px var(--neon-purple);"></div>
+        </div>
+      </div>
+
+      <!-- Skill 3 -->
+      <div style="margin-bottom: 16px;">
+        <div style="display:flex; justify-content:space-between; font-family:'Fira Code', monospace; font-size:0.8rem; margin-bottom:5px;">
+          <span>FRONT-END WEB DEV (HTML5, CSS3 &amp; JS CANVAS)</span>
+          <span style="color:var(--neon-green);">85%</span>
+        </div>
+        <div style="width:100%; background:rgba(255,255,255,0.08); height:7px; border-radius:4px; overflow:hidden;">
+          <div style="width:85%; height:100%; background:var(--neon-green); box-shadow:0 0 10px var(--neon-green);"></div>
+        </div>
+      </div>
+
+      <!-- Skill 4 -->
+      <div>
+        <div style="display:flex; justify-content:space-between; font-family:'Fira Code', monospace; font-size:0.8rem; margin-bottom:5px;">
+          <span>TELEGRAM BOT ARCHITECTURE &amp; DATABASE (SQL)</span>
+          <span style="color:var(--neon-cyan);">80%</span>
+        </div>
+        <div style="width:100%; background:rgba(255,255,255,0.08); height:7px; border-radius:4px; overflow:hidden;">
+          <div style="width:80%; height:100%; background:var(--neon-cyan); box-shadow:0 0 10px var(--neon-cyan);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rubric Item 4: Ordered List -->
+    <h3 style="margin-top: 30px;">Core Operational Capabilities</h3>
+    <ol>
+      <li><b>Leadership &amp; Team Motivation:</b> Implementing strategies that elevate morale, foster collaboration, and boost group productivity.</li>
+      <li><b>Task Prioritization &amp; Logistics:</b> Efficient time management, structuring deliverables, and executing high-priority academic milestones.</li>
+      <li><b>Digital Design &amp; Editing:</b> Proficient in Canva layout design and CapCut video production suites.</li>
+      <li><b>Productivity Suites:</b> Advanced proficiency in Microsoft Office (Word, Excel, PowerPoint) and WPS Office.</li>
+      <li><b>Linguistic Proficiency:</b> Native in Bahasa Melayu; Fluent professional command of English.</li>
+    </ol>
+
+    <!-- LIFESTYLE & PERSONAL INTERESTS GRID -->
+    <h3 style="margin-top: 30px;">Lifestyle, Hobbies &amp; Personal Radar</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px;">
+      <!-- Hobi 1 -->
+      <div class="highlight-box" style="margin: 0;">
+        <h4 style="color: var(--neon-cyan); margin-top: 0;">🏸 Badminton &amp; Fitness</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+          Active court rallies and continuous physical conditioning to maintain stamina and sharp reflexes.
+        </p>
+      </div>
+
+      <!-- Hobi 2 -->
+      <div class="highlight-box" style="margin: 0;">
+        <h4 style="color: var(--neon-purple); margin-top: 0;">📷 Visual Photography</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+          Framing perspectives, light balance, and capturing candid campus and event memories through a dedicated lens.
+        </p>
+      </div>
+
+      <!-- Hobi 3 -->
+      <div class="highlight-box" style="margin: 0;">
+        <h4 style="color: var(--neon-green); margin-top: 0;">🎮 Tactical E-Sports</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+          Strategic gameplay and teamwork dynamics in competitive Mobile Legends: Bang Bang (MLBB).
+        </p>
+      </div>
+
+      <!-- Hobi 4 -->
+      <div class="highlight-box" style="margin: 0;">
+        <h4 style="color: var(--neon-cyan); margin-top: 0;">🎬 Cinematics &amp; Acting</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+          Exploring on-screen character portrayal, storytelling, and professional music video film sets.
+        </p>
+      </div>
+    </div>
+
+    <!-- Rubric Item 4: Unordered List with Custom Markers -->
+    <h3 style="margin-top: 30px;">Sports &amp; Co-Curricular Involvements</h3>
+    <ul class="custom-marker">
+      <li>MSSD Volleyball Representative &ndash; Majlis Sukan Sekolah Daerah Kota Marudu, Sabah</li>
+      <li>MSSD Track &amp; Field Representative &ndash; Kota Marudu, Sabah</li>
+      <li>District Chess Championship Competitor &ndash; Zone 3 Kota Marudu</li>
+      <li>Recreational badminton rallies and active fitness conditioning</li>
+    </ul>
+
+    <!-- PERSONAL DIRECTIVE & CV DOWNLOAD -->
+    <section class="highlight-box" style="margin-top: 30px; text-align: center;">
+      <h3 style="color: var(--neon-green); margin-top: 0;">Personal Directive</h3>
+      <p style="font-style: italic; color: var(--text-muted); max-width: 650px; margin: 0 auto 18px;">
+        "Continuous self-improvement through technology, disciplined leadership, and authentic creative expression across all endeavors."
+      </p>
+      <a href="biodata.html" class="hud-btn" style="padding: 10px 24px; text-decoration: none; display: inline-block;">
+        📄 VIEW VERIFIED PROFILE DOSSIER
+      </a>
+    </section>
+
+    <br>
+    <a href="#top" class="hud-btn">↑ Return to Top</a>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This page is maintained by 
+      <strong>Aiman Bin Asman</strong> as part of the <strong>IMD318 Individual Project</strong>. 
+      All information is authentic and compiled in accordance with UiTM guidelines.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       VEEMON AUDIO AGENT CONTROLLER (vmonAI.mp3)
+       ======================================================== */
+    const card = document.getElementById('robotCard');
+    const speakBtn = document.getElementById('speakBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusDot = document.getElementById('statusDot');
+    const transcript = document.getElementById('transcript');
+
+    // Memuatkan fail audio vmonAI.mp3
+    const audio = new Audio('vmonAI.mp3');
+    const dossierIntro = "Hey there, visitor! I'm Veemon, the best Digital Partner ever! Let me introduce my partner, Aiman Asman—or you can just call him Eman, or Boboy! He's an awesome Information Management student at UiTM rocking a 3.28 CGPA! When it comes to front-end development, bot automation, and creative media, he's basically in full Digivolution mode! All digital systems are fully charged, so go ahead and check out his profile below! Let's go!";
+
+    function activateRobotSpeech() {
+      playCyberBeep(700, 0.08, 'triangle');
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        card.classList.add('speaking');
+        statusLabel.innerText = "Transmitting Audio";
+        statusDot.style.background = "var(--neon-cyan)";
+        statusDot.style.boxShadow = "0 0 10px var(--neon-cyan)";
+        transcript.innerText = dossierIntro;
+        speakBtn.disabled = true;
+        stopBtn.disabled = false;
+      }).catch(err => {
+        transcript.innerText = "[ERROR]: Audio playback halted. Sila pastikan fail 'vmonAI.mp3' berada dalam folder yang sama dengan biodata.html.";
+      });
+    }
+
+    function haltRobotSpeech() {
+      playCyberBeep(350, 0.06, 'sawtooth');
+      audio.pause();
+      audio.currentTime = 0;
+      resetState();
+    }
+
+    audio.onended = resetState;
+
+    function resetState() {
+      card.classList.remove('speaking');
+      statusLabel.innerText = "Standby";
+      statusDot.style.background = "var(--neon-green)";
+      statusDot.style.boxShadow = "0 0 8px var(--neon-green)";
+      speakBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    /* ========================================================
+       LIVE CLOCK SCRIPT
+       ======================================================== */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateClock, 1000); 
+    updateClock();
+
+    // Simulated Ping Telemetry
+    setInterval(() => {
+      document.getElementById('hud-ping-display').innerText = `PING: ${Math.floor(Math.random() * 8) + 16}ms`;
+    }, 3000);
+
+    /* ========================================================
+       PARTICLE BACKGROUND CANVAS
+       ======================================================== */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); 
+    resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+      }
+    }
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      btn.innerText = sfxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+      btn.style.color = sfxEnabled ? 'var(--neon-cyan)' : '#64748b';
+      if (sfxEnabled) playCyberBeep(880, 0.08);
+    }
+    function playCyberBeep(f=600, d=0.06, t='sine') {
+      if (!sfxEnabled) return;
+      try {
+        const c = getAudioContext(), o = c.createOscillator(), g = c.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, c.currentTime);
+        g.gain.setValueAtTime(0.08, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + d);
+        o.connect(g); g.connect(c.destination);
+        o.start(); o.stop(c.currentTime + d);
+      } catch(e){}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .slide-btn, .dot-indicator').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+
+    /* ========================================================
+       SLIDESHOW CONTROLLER LOGIC
+       ======================================================== */
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-item');
+    const dots = document.querySelectorAll('.dot-indicator');
+    const caption = document.getElementById('slide-caption');
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+
+      if (caption) {
+        caption.innerText = `IMAGE NODE: [0${currentSlide + 1} / 0${slides.length}]`;
+      }
+    }
+
+    function changeSlide(direction) {
+      playCyberBeep(650, 0.05);
+      showSlide(currentSlide + direction);
+    }
+
+    function jumpToSlide(index) {
+      playCyberBeep(750, 0.05);
+      showSlide(index);
+    }
+
+    // Auto rotate every 5 seconds
+    setInterval(() => {
+      showSlide(currentSlide + 1);
+    }, 5000);
+  </script>
+</body>
+</html>

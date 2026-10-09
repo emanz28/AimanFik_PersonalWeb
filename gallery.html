@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery - emann.SYS | IMD318</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= GUILMON PARTNER COMPONENT STYLES ================= */
+    .robot-section {
+      display: flex;
+      justify-content: center;
+      margin: 25px auto 35px;
+      width: 100%;
+    }
+
+    .robot-card {
+      position: relative;
+      background: rgba(4, 8, 20, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      width: 100%;
+      max-width: 520px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .guilmon-container {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .guilmon-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(255, 51, 85, 0.45));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      animation: guilmonIdle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes guilmonIdle {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* Animasi apabila Guilmon bercakap / audio aktif */
+    .speaking .guilmon-img {
+      animation: guilmonBounce 0.35s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px #ff3355) brightness(1.2);
+    }
+
+    @keyframes guilmonBounce {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-8px) scale(1.08); }
+    }
+
+    .system-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      color: #ff3355;
+      text-transform: uppercase;
+      margin-top: 4px;
+      text-shadow: 0 0 10px rgba(255, 51, 85, 0.4);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 5px 0 10px;
+    }
+
+    .mouth-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 24px;
+      margin: 4px auto 14px;
+      width: 140px;
+    }
+
+    .mouth-viz span {
+      width: 4px;
+      height: 5px;
+      background: rgba(255, 51, 85, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .speaking .mouth-viz span {
+      background: #ff3355;
+      box-shadow: 0 0 8px #ff3355;
+      animation: soundWave 0.45s ease-in-out infinite alternate;
+    }
+
+    .speaking .mouth-viz span:nth-child(2) { animation-delay: 0.1s; }
+    .speaking .mouth-viz span:nth-child(3) { animation-delay: 0.2s; }
+    .speaking .mouth-viz span:nth-child(4) { animation-delay: 0.05s; }
+    .speaking .mouth-viz span:nth-child(5) { animation-delay: 0.25s; }
+    .speaking .mouth-viz span:nth-child(6) { animation-delay: 0.15s; }
+    .speaking .mouth-viz span:nth-child(7) { animation-delay: 0.3s; }
+    .speaking .mouth-viz span:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes soundWave {
+      0% { height: 4px; }
+      100% { height: 22px; }
+    }
+
+    .transcript-box {
+      background: #02050c;
+      border: 1px solid rgba(255, 51, 85, 0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      text-align: left;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .robot-btn {
+      background: rgba(255, 51, 85, 0.08);
+      border: 1px solid #ff3355;
+      color: #ff3355;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .robot-btn:hover:not(:disabled) {
+      background: #ff3355;
+      color: #03060f;
+      box-shadow: 0 0 16px #ff3355;
+    }
+
+    .robot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+
+    /* ================= THUMBNAIL GALLERY GRID STYLES ================= */
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .thumb-card {
+      background: rgba(6, 11, 25, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+    }
+
+    .thumb-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+    }
+
+    .thumb-img-wrapper {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      background: #02050c;
+    }
+
+    .thumb-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .thumb-card:hover .thumb-img-wrapper img {
+      transform: scale(1.08);
+    }
+
+    .thumb-meta {
+      padding: 12px 14px;
+    }
+
+    .thumb-meta h4 {
+      font-size: 0.9rem;
+      margin: 0 0 6px;
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', monospace;
+    }
+
+    .thumb-meta p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .thumb-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-family: 'Fira Code', monospace;
+      color: var(--neon-green);
+      background: rgba(0, 255, 102, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-top: 8px;
+    }
+
+    /* Media players styling */
+    .media-card {
+      background: rgba(6, 11, 25, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 25px;
+    }
+
+    .media-card audio {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 30px;
+    }
+
+    .media-card video {
+      width: 100%;
+      max-height: 420px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      margin-top: 12px;
+      background: #000;
+    }
+  </style>
+</head>
+<body id="top">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Top Cyber HUD Header -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign"><span class="status-dot"></span> emann.SYS</div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+    <nav class="hud-nav">
+      <a href="index.html">00 // HOME</a>
+      <a href="biodata.html">01 // BIODATA</a>
+      <a href="education.html">02 // EDUCATION</a>
+      <a href="experience.html">03 // EXPERIENCE</a>
+      <a href="family.html">04 // FAMILY</a>
+      <a href="gallery.html" class="active">05 // GALLERY</a>
+    </nav>
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">🔊 SFX: ON</button>
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <main class="container" id="gallery-content" style="margin-top: 40px;">
+    <h2>05 // MULTIMEDIA &amp; VISUAL ARTIFACTS</h2>
+    <hr>
+
+    <p>
+      Multimedia repository housing HTML5 audio streams, video media, and external thumbnail links 
+      fulfilling all requirements of the <abbr title="Introduction to Web Content Management & Design">IMD318</abbr> curriculum.
+    </p>
+
+    <!-- ========================================================
+         GUILMON DIGITAL PARTNER AUDIO INTERFACE (GALLERY)
+         ======================================================== -->
+    <section class="robot-section">
+      <div class="robot-card" id="robotCard">
+        <div class="guilmon-container">
+          <img src="guilmon.gif" alt="Guilmon Partner" class="guilmon-img" id="guilmonSprite" onerror="this.src='veemon.gif'">
+        </div>
+
+        <div class="system-title">GUILMON // MEDIA VAULT DISPATCHER</div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot" style="background: #ff3355; box-shadow: 0 0 8px #ff3355;"></span>
+          <span id="statusLabel">Standby</span>
+        </div>
+
+        <!-- Audio Wave Visualizer Bars -->
+        <div class="mouth-viz">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Vocal Transcript Box -->
+        <div class="transcript-box" id="transcript">
+          "Guilmon is ready! Press 'Transmit Briefing' to listen to the media vault briefing!"
+        </div>
+
+        <div class="actions">
+          <button type="button" class="robot-btn" id="speakBtn" onclick="activateRobotSpeech()">Transmit Briefing</button>
+          <button type="button" class="robot-btn" id="stopBtn" onclick="haltRobotSpeech()" disabled>Silence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         1. AUDIO TRANSMISSION (HTML5 <audio>) - PENDAM RASA
+         ======================================================== -->
+    <section class="media-card">
+      <h3 style="color: var(--neon-cyan); margin: 0 0 6px;">1. Audio Transmission (HTML5 &lt;audio&gt;)</h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">
+        Broadcast stream of soundtrack: <b style="color: var(--neon-cyan);">"Pendam Rasa"</b>
+      </p>
+      <audio controls>
+        <source src="PendamRasa.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </section>
+
+    <!-- ========================================================
+         2. VISUAL VIDEO STREAM (HTML5 <video>) - MV TERUS BERSINAR
+         ======================================================== -->
+    <section class="media-card">
+      <h3 style="color: var(--neon-purple); margin: 0 0 6px;">2. Visual Video Stream (HTML5 &lt;video&gt;)</h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">
+        Official cinematic music video feature &bull; <i>"Terus Bersinar"</i> (Hafiz Suip) on-screen acting footage:
+      </p>
+      <video controls poster="exp-mv1.jpg">
+        <source src="mvterusbersinar.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </section>
+
+    <!-- ========================================================
+         3. EXTERNAL THUMBNAIL LINKS (RUBRIC REQUIREMENT)
+         ======================================================== -->
+    <h3 style="margin-top: 40px;">3. Image Thumbnail Artifacts (Clickable Links)</h3>
+    <p style="color: var(--text-muted); font-size: 0.88rem;">
+      Curated image thumbnails linking to authentic production evidence, high-resolution reels, and verified project records:
+    </p>
+
+    <div class="thumb-grid">
+      <!-- Thumbnail 1: Lakonan MV Terus Bersinar -->
+      <a href="exp-mv1.jpg" target="_blank" class="thumb-card">
+        <div class="thumb-img-wrapper">
+          <img src="exp-mv1.jpg" alt="Acting Cast in Terus Bersinar Music Video" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <div class="thumb-meta">
+          <h4>MV "Terus Bersinar"</h4>
+          <p>On-screen acting cast alongside professional film crew in Hafiz Suip's official music video.</p>
+          <span class="thumb-badge">VIEW FULL FRAME ↗</span>
+        </div>
+      </a>
+
+      <!-- Thumbnail 2: Latihan Industri PPD Kota Marudu -->
+      <a href="exp-ppd.jpg" target="_blank" class="thumb-card">
+        <div class="thumb-img-wrapper">
+          <img src="exp-ppd.jpg" alt="PPD Kota Marudu ICT Industrial Attachment" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <div class="thumb-meta">
+          <h4>PPD Kota Marudu Trainee</h4>
+          <p>School ICT unit deployment, hardware maintenance, and @ppdkmBot server integrations.</p>
+          <span class="thumb-badge">VIEW FULL FRAME ↗</span>
+        </div>
+      </a>
+
+      <!-- Thumbnail 3: UiTM Campus Leadership -->
+      <a href="exp-uitm.jpg" target="_blank" class="thumb-card">
+        <div class="thumb-img-wrapper">
+          <img src="exp-uitm.jpg" alt="UiTM Samarahan Campus Involvement" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <div class="thumb-meta">
+          <h4>UiTM Leadership</h4>
+          <p>Student Representative Council (MPP) candidacy and campus student welfare initiatives.</p>
+          <span class="thumb-badge">VIEW FULL FRAME ↗</span>
+        </div>
+      </a>
+
+      <!-- Thumbnail 4: Floor Manager Karnival Pendidikan -->
+      <a href="exp-madani.jpg" target="_blank" class="thumb-card">
+        <div class="thumb-img-wrapper">
+          <img src="exp-madani.jpg" alt="Floor Manager Karnival Pendidikan MADANI" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <div class="thumb-meta">
+          <h4>Karnival MADANI</h4>
+          <p>Floor management, audio-visual technical cues, and VIP entrance protocols in Kota Marudu.</p>
+          <span class="thumb-badge">VIEW FULL FRAME ↗</span>
+        </div>
+      </a>
+    </div>
+
+    <br>
+    <a href="#top" class="hud-btn" style="margin-top: 20px;">↑ Return to Top</a>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This multimedia gallery was authored and produced by 
+      <strong>Aiman Bin Asman</strong> for <strong>IMD318: Individual Project</strong>. 
+      All audio streams, video media, and graphic assets comply with academic criteria.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       GUILMON AUDIO AGENT CONTROLLER (guilmon.mp3)
+       ======================================================== */
+    const card = document.getElementById('robotCard');
+    const speakBtn = document.getElementById('speakBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusDot = document.getElementById('statusDot');
+    const transcript = document.getElementById('transcript');
+
+    // Memuatkan fail audio guilmon.mp3
+    const audio = new Audio('guilmon.mp3');
+    const dossierIntro = "Guilmon here! Welcome to Aiman's Digital Media Vault! Ooh, look at all these shiny sound waves, video reels, and cool snapshot memories! Over here, we've got awesome audio tracks like 'Pendam Rasa', and real cinematic video footage from Aiman's on-screen acting scenes! Plus, you can click on any thumbnail artifact down below to inspect the full gallery archives! Digivolve your eyes and ears, and enjoy the show!";
+
+    function activateRobotSpeech() {
+      playCyberBeep(700, 0.08, 'triangle');
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        card.classList.add('speaking');
+        statusLabel.innerText = "Transmitting Audio";
+        statusDot.style.background = "#ff3355";
+        statusDot.style.boxShadow = "0 0 10px #ff3355";
+        transcript.innerText = dossierIntro;
+        speakBtn.disabled = true;
+        stopBtn.disabled = false;
+      }).catch(err => {
+        transcript.innerText = "[ERROR]: Audio playback halted. Sila pastikan fail 'guilmon.mp3' berada dalam folder yang sama dengan gallery.html.";
+      });
+    }
+
+    function haltRobotSpeech() {
+      playCyberBeep(350, 0.06, 'sawtooth');
+      audio.pause();
+      audio.currentTime = 0;
+      resetState();
+    }
+
+    audio.onended = resetState;
+
+    function resetState() {
+      card.classList.remove('speaking');
+      statusLabel.innerText = "Standby";
+      statusDot.style.background = "var(--neon-green)";
+      statusDot.style.boxShadow = "0 0 8px var(--neon-green)";
+      speakBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    /* ========================================================
+       LIVE CLOCK & TELEMETRY SCRIPT
+       ======================================================== */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateClock, 1000); 
+    updateClock();
+
+    setInterval(() => {
+      document.getElementById('hud-ping-display').innerText = `PING: ${Math.floor(Math.random() * 8) + 16}ms`;
+    }, 3000);
+
+    /* ========================================================
+       PARTICLE CANVAS BACKGROUND
+       ======================================================== */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); 
+    resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+      }
+    }
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      btn.innerText = sfxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+      btn.style.color = sfxEnabled ? 'var(--neon-cyan)' : '#64748b';
+      if (sfxEnabled) playCyberBeep(880, 0.08);
+    }
+    function playCyberBeep(f=600, d=0.06, t='sine') {
+      if (!sfxEnabled) return;
+      try {
+        const c = getAudioContext(), o = c.createOscillator(), g = c.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, c.currentTime);
+        g.gain.setValueAtTime(0.08, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + d);
+        o.connect(g); g.connect(c.destination);
+        o.start(); o.stop(c.currentTime + d);
+      } catch(e){}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .thumb-card').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+  </script>
+</body>
+</html>

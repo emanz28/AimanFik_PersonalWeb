@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experience - emann.SYS | IMD318</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= VEEMON PARTNER COMPONENT STYLES ================= */
+    .robot-section {
+      display: flex;
+      justify-content: center;
+      margin: 25px auto 35px;
+      width: 100%;
+    }
+
+    .robot-card {
+      position: relative;
+      background: rgba(4, 8, 20, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      width: 100%;
+      max-width: 520px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .veemon-container {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .veemon-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      animation: veemonIdle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes veemonIdle {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* Animasi apabila Veemon sedang bercakap / audio aktif */
+    .speaking .veemon-img {
+      animation: veemonTalkBounce 0.35s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px var(--neon-cyan)) brightness(1.2);
+    }
+
+    @keyframes veemonTalkBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px) scale(1.08); }
+    }
+
+    .system-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 5px 0 10px;
+    }
+
+    .mouth-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 24px;
+      margin: 4px auto 14px;
+      width: 140px;
+    }
+
+    .mouth-viz span {
+      width: 4px;
+      height: 5px;
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .speaking .mouth-viz span {
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: soundWave 0.45s ease-in-out infinite alternate;
+    }
+
+    .speaking .mouth-viz span:nth-child(2) { animation-delay: 0.1s; }
+    .speaking .mouth-viz span:nth-child(3) { animation-delay: 0.2s; }
+    .speaking .mouth-viz span:nth-child(4) { animation-delay: 0.05s; }
+    .speaking .mouth-viz span:nth-child(5) { animation-delay: 0.25s; }
+    .speaking .mouth-viz span:nth-child(6) { animation-delay: 0.15s; }
+    .speaking .mouth-viz span:nth-child(7) { animation-delay: 0.3s; }
+    .speaking .mouth-viz span:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes soundWave {
+      0% { height: 4px; }
+      100% { height: 22px; }
+    }
+
+    .transcript-box {
+      background: #02050c;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      text-align: left;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .robot-btn {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .robot-btn:hover:not(:disabled) {
+      background: var(--neon-cyan);
+      color: #03060f;
+      box-shadow: 0 0 16px var(--neon-cyan);
+    }
+
+    .robot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body id="top">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Top Cyber HUD Header -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign"><span class="status-dot"></span> emann.SYS</div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+    <nav class="hud-nav">
+      <a href="index.html">00 // HOME</a>
+      <a href="biodata.html">01 // BIODATA</a>
+      <a href="education.html">02 // EDUCATION</a>
+      <a href="experience.html" class="active">03 // EXPERIENCE</a>
+      <a href="family.html">04 // FAMILY</a>
+      <a href="gallery.html">05 // GALLERY</a>
+    </nav>
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">🔊 SFX: ON</button>
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <main class="container" id="exp-content" style="margin-top: 40px;">
+    <h2>03 // PROFESSIONAL EXPERIENCE, CREATIVE ARTS &amp; LEADERSHIP</h2>
+    <hr>
+
+    <p>
+      Comprehensive operational records detailing my industrial training at 
+      <b>Pejabat Pendidikan Daerah (PPD) Kota Marudu</b>, district-level floor management, e-sports event coordination, creative acting roles in commercial music videos, 
+      leadership milestones at <abbr title="Universiti Teknologi MARA">UiTM</abbr>, and foundation co-curricular years.
+    </p>
+
+    <!-- ========================================================
+         VEEMON DIGITAL PARTNER AUDIO INTERFACE (EXPERIENCE)
+         ======================================================== -->
+    <section class="robot-section">
+      <div class="robot-card" id="robotCard">
+        <div class="veemon-container">
+          <img src="veemon.gif" alt="Veemon Partner" class="veemon-img" id="veemonSprite">
+        </div>
+
+        <div class="system-title">V-MON // FIELD EXPERIENCE LOG</div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusLabel">Standby</span>
+        </div>
+
+        <!-- Audio Wave Visualizer Bars -->
+        <div class="mouth-viz">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Vocal Transcript Box -->
+        <div class="transcript-box" id="transcript">
+          "System ready. Press 'Transmit Briefing' to begin operational audio telemetry."
+        </div>
+
+        <div class="actions">
+          <button type="button" class="robot-btn" id="speakBtn" onclick="activateRobotSpeech()">Transmit Briefing</button>
+          <button type="button" class="robot-btn" id="stopBtn" onclick="haltRobotSpeech()" disabled>Silence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         CYBER EXPERIENCE SLIDESHOW (7 EVIDENCE SLIDES)
+         ======================================================== -->
+    <h3 style="margin-top: 25px;">Milestone Evidence Visual Reel</h3>
+    <section class="slideshow-wrapper">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <button class="slide-btn prev" onclick="changeSlide(-1)">❮</button>
+      <button class="slide-btn next" onclick="changeSlide(1)">❯</button>
+
+      <div class="slideshow-frame">
+        <!-- Slide 1: SMK Bengkongan -->
+        <div class="slide-item active">
+          <img src="exp-smk.jpg" alt="SMK Bengkongan Co-Curricular Evidence">
+        </div>
+        <!-- Slide 2: UiTM Samarahan -->
+        <div class="slide-item">
+          <img src="exp-uitm.jpg" alt="UiTM Campus Leadership Evidence">
+        </div>
+        <!-- Slide 3: PPD Kota Marudu (ICT Intern) -->
+        <div class="slide-item">
+          <img src="exp-ppd.jpg" alt="PPD Kota Marudu Industrial Training Evidence">
+        </div>
+        <!-- Slide 4: Floor Manager Karnival Pendidikan MADANI -->
+        <div class="slide-item">
+          <img src="exp-madani.jpg" alt="Floor Manager Karnival Pendidikan MADANI Peringkat Daerah Kota Marudu" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <!-- Slide 5: AJK Pelaksana Pertandingan MLBB (KBS & MH-Esport) -->
+        <div class="slide-item">
+          <img src="exp-mlbb.jpg" alt="AJK Pelaksana Pertandingan MLBB KBS & MH-Esport" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <!-- Slide 6: MV Terus Bersinar - Hafiz Suip (Scene 1) -->
+        <div class="slide-item">
+          <img src="exp-mv1.jpg" alt="On-Screen Acting Cast in Terus Bersinar Official Music Video" onerror="this.src='EMANZER.jpg'">
+        </div>
+        <!-- Slide 7: MV Terus Bersinar - Hafiz Suip (Scene 2 / BTS) -->
+        <div class="slide-item">
+          <img src="exp-mv2.jpg" alt="Behind The Scenes Production in Terus Bersinar Music Video" onerror="this.src='EMANZER.jpg'">
+        </div>
+      </div>
+
+      <div class="slide-controls">
+        <span id="slide-caption">ARCHIVE NODE: [01 / 07] &bull; SMK BENGKONGAN</span>
+        <div class="slide-dots">
+          <span class="dot-indicator active" onclick="jumpToSlide(0)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(1)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(2)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(3)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(4)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(5)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(6)"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rubric Item 5: Complex Table with Colspan & Rowspan -->
+    <h3 style="margin-top: 30px;">Career, Creative &amp; Practical Training Timeline</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Duration / Year</th>
+          <th>Designation / Role</th>
+          <th>Organization / Production</th>
+          <th>Core Responsibilities &amp; Verification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Latihan Industri PPD Kota Marudu (Termasuk Floor Manager & AJK MLBB) -->
+        <tr>
+          <td rowspan="5"><b>27 Julai 2026 &ndash; 18 September 2026</b><br><small style="color:var(--neon-green);">[Certified Appreciation Award]</small></td>
+          <td><b>Floor Manager (Event Operations)</b></td>
+          <td>Karnival Pendidikan MADANI Peringkat Daerah Kota Marudu</td>
+          <td>Appointed as Floor Manager overseeing event stage cues, audio-visual technical readiness, VIP entrance protocols, and dynamic crowd coordination for the district-level education carnival.</td>
+        </tr>
+        <tr>
+          <td><b>Organizing Committee (AJK Pelaksana)</b></td>
+          <td>Pertandingan MLBB anjuran Kementerian Belia dan Sukan (KBS) &amp; Kelab MH-Esport</td>
+          <td>Managed technical tournament bracket execution, team registration logs, player staging coordination, and match lobby administration during the official KBS youth e-sports championship.</td>
+        </tr>
+        <tr>
+          <td><b>Industrial Trainee (ICT Intern)</b></td>
+          <td>Pejabat Pendidikan Daerah Kota Marudu &ndash; Pasukan Teknikal ICT Sekolah (PTIS)</td>
+          <td>Assisted in technical ICT troubleshooting, institutional network coordination, digital record upkeep, and technical field assistance.</td>
+        </tr>
+        <tr>
+          <td><b>Lead Bot Assistant Developer</b></td>
+          <td>PPD Kota Marudu Digitalization Taskforce</td>
+          <td>Engineered, scripted, and deployed <b>NAVIS THE SMARTBOT</b> (<code>@ppdkmBot</code>) on Telegram for departmental logistics and inquiries.</td>
+        </tr>
+        <tr>
+          <td><b>Digital Media Producer</b></td>
+          <td>Corporate Communication &amp; Media Unit</td>
+          <td>Designed official departmental graphics, posters, and multimedia documentation under ministerial directives.</td>
+        </tr>
+        <!-- UiTM Leadership -->
+        <tr>
+          <td rowspan="2"><b>2024 &ndash; Present</b></td>
+          <td><b>MPP Candidate &amp; Student Representative</b></td>
+          <td>Majlis Perwakilan Pelajar, UiTM Kampus Samarahan</td>
+          <td>Selected faculty representative candidate; drafted student manifestos and represented UiTM at Kem AMAR Zone Borneo.</td>
+        </tr>
+        <tr>
+          <td><b>Founder &amp; Logistics Lead</b></td>
+          <td>The Roommate Detergent Solution</td>
+          <td>Managed student laundry refill supply operations across campus dormitories, including inventory and promotion.</td>
+        </tr>
+        <!-- Penglibatan Muzik Video: October 2023 -->
+        <tr>
+          <td><b>October 2023</b><br><small style="color:var(--neon-purple);">[Creative Arts &bull; Media]</small></td>
+          <td><b>Featured Cast / Acting Role</b></td>
+          <td>Official Music Video: <i>"Terus Bersinar"</i> &ndash; Hafiz Suip</td>
+          <td>Selected as an on-screen cast member for the official music video production, collaborating closely with professional film crews and delivering authentic visual expressions.</td>
+        </tr>
+        <!-- Era Persekolahan SMK -->
+        <tr>
+          <td><b>2019 &ndash; 2023</b></td>
+          <td><b>Library Prefect (Technical Bureau)</b></td>
+          <td>SMK. Bengkongan, Kota Marudu</td>
+          <td>Assisted with technical classification, metadata cataloging, and physical archiving of library resources.</td>
+        </tr>
+        <tr>
+          <td colspan="4" style="background: rgba(0, 240, 255, 0.05); text-align: center; color: var(--neon-cyan);">
+            <i>All practical training attachments, event appointments, and creative media portfolios documented for academic verification.</i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Rubric Item 1: Preformatted Code Block -->
+    <section class="highlight-box">
+      <h3>Creative &amp; Technical Milestone Highlights</h3>
+      <p>Official telemetry log for digital automations, event operations, and professional media productions:</p>
+      <pre>
+[CREATIVE_&amp;_SYSTEMS_LOG]
+Event Duty 01 : Floor Manager &bull; Karnival Pendidikan MADANI Daerah Kota Marudu
+Event Duty 02 : Organizing Committee &bull; MLBB Tournament (KBS &amp; Kelab MH-Esport)
+Intern Unit   : Pasukan Teknikal ICT Sekolah (PTIS) &bull; PPD Kota Marudu
+Bot Identity  : NAVIS THE SMARTBOT (@ppdkmBot) &bull; Telegram Webhook System
+Creative Media: Official Music Video "Terus Bersinar" - Hafiz Suip (Cast, Oct 2023)
+Leadership    : Student Representative Council (Candidate) &bull; UiTM Samarahan
+Status        : Active Portfolio Asset &bull; IMD318 Verified
+      </pre>
+    </section>
+
+    <!-- Rubric Item 4: Ordered List -->
+    <h3 style="margin-top: 25px;">Key Competencies Acquired Across Disciplines</h3>
+    <ol>
+      <li><b>District Event &amp; Floor Management:</b> Spearheaded stage timing, technical live coordination, and VIP protocol execution during the Karnival Pendidikan MADANI Peringkat Daerah Kota Marudu.</li>
+      <li><b>E-Sports Tournament Logistics:</b> Orchestrated tournament brackets, player coordination, match schedules, and technical lobby hosting for the KBS MLBB Championship organized by Kelab MH-Esport.</li>
+      <li><b>Cinematic Performance &amp; On-Screen Acting:</b> Gained practical set experience performing in front of professional cinematography cameras for commercial broadcast during October 2023 ("Terus Bersinar" - Hafiz Suip).</li>
+      <li><b>ICT Systems &amp; Hardware Support (PPD):</b> Technical diagnostics, network configuration, and hardware maintenance under Pasukan Teknikal ICT Sekolah (PTIS).</li>
+      <li><b>Digital Leadership &amp; Student Advocacy (UiTM):</b> Public representation, manifestos drafting, and active participation in anti-corruption youth summits.</li>
+      <li><b>Information Management &amp; Cataloging (SMK):</b> Foundational library record classification, metadata archiving, and secretarial executive duties.</li>
+    </ol>
+
+    <!-- Rubric Item 4: Unordered List with Custom Markers -->
+    <h3 style="margin-top: 25px;">Co-Curricular &amp; Creative Distinctions</h3>
+    <ul class="custom-marker">
+      <li>Floor Manager &ndash; Karnival Pendidikan MADANI Peringkat Daerah Kota Marudu</li>
+      <li>Organizing Committee (AJK Pelaksana) &ndash; Kejohanan MLBB Anjuran KBS &amp; Kelab MH-Esport</li>
+      <li>Industrial Training Certificate of Appreciation &ndash; PPD Kota Marudu</li>
+      <li>Featured Cast / On-Screen Acting Appearance in "Terus Bersinar" Music Video (Hafiz Suip, October 2023)</li>
+      <li>Student Representative Council (MPP 2025/2026) Candidate &ndash; UiTM Samarahan</li>
+      <li>Malaysia Future Leaders School (MFLS) Tier 2 Cohort 21 Graduate</li>
+      <li>Subject Excellence Award (Bahasa Melayu) SPM 2023 &ndash; SMK Bengkongan</li>
+    </ul>
+
+    <br>
+    <a href="#top" class="hud-btn">↑ Return to Top</a>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This portfolio of experience was created by 
+      <strong>Aiman Bin Asman</strong> for the <strong>IMD318 Individual Project</strong>. 
+      All project descriptions, event operational records, and industrial training attachments are documented truthfully.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       VEEMON AUDIO AGENT CONTROLLER (vmonExp.mp3)
+       ======================================================== */
+    const card = document.getElementById('robotCard');
+    const speakBtn = document.getElementById('speakBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusDot = document.getElementById('statusDot');
+    const transcript = document.getElementById('transcript');
+
+    // Memuatkan fail audio vmonExp.mp3
+    const audio = new Audio('vmonExp.mp3');
+    const dossierIntro = "Mission ready! Welcome to Aiman's Field Experience archive! I'm Veemon! My partner doesn't just work behind the screen—he's got on-camera talent too! That's right, Aiman has real acting and cinematic performance experience, bringing stories and character expressions to life on set! Combine that with his tactical ICT internship at PPD Kota Marudu, bot automation, and multimedia production, and you've got an unstoppable all-rounder! Scroll down to inspect his operational roles, acting credits, and projects! Let's check it out!";
+
+    function activateRobotSpeech() {
+      playCyberBeep(700, 0.08, 'triangle');
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        card.classList.add('speaking');
+        statusLabel.innerText = "Transmitting Audio";
+        statusDot.style.background = "var(--neon-cyan)";
+        statusDot.style.boxShadow = "0 0 10px var(--neon-cyan)";
+        transcript.innerText = dossierIntro;
+        speakBtn.disabled = true;
+        stopBtn.disabled = false;
+      }).catch(err => {
+        transcript.innerText = "[ERROR]: Audio playback halted. Sila pastikan fail 'vmonExp.mp3' berada dalam folder yang sama dengan experience.html.";
+      });
+    }
+
+    function haltRobotSpeech() {
+      playCyberBeep(350, 0.06, 'sawtooth');
+      audio.pause();
+      audio.currentTime = 0;
+      resetState();
+    }
+
+    audio.onended = resetState;
+
+    function resetState() {
+      card.classList.remove('speaking');
+      statusLabel.innerText = "Standby";
+      statusDot.style.background = "var(--neon-green)";
+      statusDot.style.boxShadow = "0 0 8px var(--neon-green)";
+      speakBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    // Live Clock Script
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateClock, 1000); 
+    updateClock();
+
+    // Simulated Ping Telemetry
+    setInterval(() => {
+      document.getElementById('hud-ping-display').innerText = `PING: ${Math.floor(Math.random() * 8) + 16}ms`;
+    }, 3000);
+
+    // Particle Canvas Background
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); 
+    resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+      }
+    }
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      btn.innerText = sfxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+      btn.style.color = sfxEnabled ? 'var(--neon-cyan)' : '#64748b';
+      if (sfxEnabled) playCyberBeep(880, 0.08);
+    }
+    function playCyberBeep(f=600, d=0.06, t='sine') {
+      if (!sfxEnabled) return;
+      try {
+        const c = getAudioContext(), o = c.createOscillator(), g = c.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, c.currentTime);
+        g.gain.setValueAtTime(0.08, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + d);
+        o.connect(g); g.connect(c.destination);
+        o.start(); o.stop(c.currentTime + d);
+      } catch(e){}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .slide-btn, .dot-indicator').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+
+    /* ========================================================
+       SLIDESHOW CONTROLLER (7 LABELS)
+       ======================================================== */
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-item');
+    const dots = document.querySelectorAll('.dot-indicator');
+    const caption = document.getElementById('slide-caption');
+    const labels = [
+      'ARCHIVE NODE: [01 / 07] &bull; SMK BENGKONGAN',
+      'ARCHIVE NODE: [02 / 07] &bull; UITM SAMARAHAN',
+      'ARCHIVE NODE: [03 / 07] &bull; PPD KOTA MARUDU (ICT INTERN)',
+      'ARCHIVE NODE: [04 / 07] &bull; FLOOR MANAGER: KARNIVAL PENDIDIKAN MADANI',
+      'ARCHIVE NODE: [05 / 07] &bull; AJK PELAKSANA: MLBB TOURNAMENT (KBS & MH-ESPORT)',
+      'ARCHIVE NODE: [06 / 07] &bull; MV TERUS BERSINAR (OCTOBER 2023 SCENE)',
+      'ARCHIVE NODE: [07 / 07] &bull; MV TERUS BERSINAR (OCTOBER 2023 BTS)'
+    ];
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+
+      if (caption) {
+        caption.innerHTML = labels[currentSlide];
+      }
+    }
+
+    function changeSlide(direction) {
+      playCyberBeep(650, 0.05);
+      showSlide(currentSlide + direction);
+    }
+
+    function jumpToSlide(index) {
+      playCyberBeep(750, 0.05);
+      showSlide(index);
+    }
+
+    setInterval(() => {
+      showSlide(currentSlide + 1);
+    }, 5000);
+  </script>
+</body>
+</html>

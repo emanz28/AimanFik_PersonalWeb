@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - emann.SYS | AimanFik_PersonalWeb</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= CYBER BOOT LOADER (EXCLUSIVE TO HOME) ================= */
+    #cyber-loader {
+      position: fixed;
+      inset: 0;
+      background: #02050c;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s ease;
+    }
+
+    #cyber-loader.loaded {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-terminal {
+      width: 90%;
+      max-width: 440px;
+      background: rgba(4, 9, 23, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 8px;
+      padding: 26px 22px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      text-align: center;
+    }
+
+    .loader-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .loader-bar-frame {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 14px 0 10px;
+    }
+
+    .loader-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+      box-shadow: 0 0 12px var(--neon-cyan);
+      transition: width 0.06s ease;
+    }
+
+    .loader-log {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ================= HERO VEEMON PARTNER STYLES ================= */
+    .hero-name-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 8px;
+    }
+
+    .hero-veemon-gif {
+      width: 95px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px var(--neon-cyan));
+      animation: veemonFloating 3s ease-in-out infinite alternate;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes veemonFloating {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-name-container {
+        gap: 12px;
+      }
+      .hero-veemon-gif {
+        width: 70px;
+      }
+    }
+
+    /* ================= SOCIAL MEDIA CARD HOVER EFFECTS ================= */
+    .contact-card.facebook:hover {
+      border-color: #1877f2;
+      box-shadow: 0 0 18px rgba(24, 119, 242, 0.35);
+    }
+    .contact-card.facebook:hover .contact-val,
+    .contact-card.facebook:hover .contact-arrow {
+      color: #1877f2;
+    }
+
+    .contact-card.tiktok:hover {
+      border-color: #ff0050;
+      box-shadow: 0 0 18px rgba(255, 0, 80, 0.35);
+    }
+    .contact-card.tiktok:hover .contact-val,
+    .contact-card.tiktok:hover .contact-arrow {
+      color: #ff0050;
+    }
+
+    .contact-card.instagram:hover {
+      border-color: #e1306c;
+      box-shadow: 0 0 18px rgba(225, 48, 108, 0.35);
+    }
+    .contact-card.instagram:hover .contact-val,
+    .contact-card.instagram:hover .contact-arrow {
+      color: #e1306c;
+    }
+  </style>
+</head>
+<body id="top">
+
+  <!-- ================= CYBER BOOT LOADER (ACTIVE ON LOAD & REFRESH) ================= -->
+  <div id="cyber-loader">
+    <div class="loader-terminal">
+      <div class="loader-badge">
+        <span class="status-dot"></span> INITIALIZING emann.SYS
+      </div>
+      <div class="loader-bar-frame">
+        <div class="loader-bar-fill" id="loader-progress"></div>
+      </div>
+      <div class="loader-log">
+        <span id="loader-status">SYNCING CORE PROTOCOLS...</span>
+        <span id="loader-percent" style="color: var(--neon-cyan); font-weight: bold;">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Canvas Particles Background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- TOP CYBER HUD BAR -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign">
+        <span class="status-dot"></span> emann.SYS
+      </div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+
+    <nav class="hud-nav">
+      <a href="index.html" class="active">00 // HOME</a>
+      <a href="biodata.html">01 // BIODATA</a>
+      <a href="education.html">02 // EDUCATION</a>
+      <a href="experience.html">03 // EXPERIENCE</a>
+      <a href="family.html">04 // FAMILY</a>
+      <a href="gallery.html">05 // GALLERY</a>
+    </nav>
+
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">
+        🔊 SFX: ON
+      </button>
+
+      <button class="hud-btn" onclick="openTerminal()" style="cursor: pointer;">
+        &gt;_ TERMINAL
+      </button>
+      
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-wrapper">
+    <div class="hero-text-col">
+      <div class="hero-pill">● UITM • INFORMATION MANAGEMENT • DEV</div>
+
+      <div style="font-family: 'Fira Code', monospace; font-size: 0.88rem; color: var(--neon-cyan); letter-spacing: 1.5px; margin-bottom: 12px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);">
+        🌐✨ WELCOME TO MY PERSONAL WEBSITE ✨🌐
+      </div>
+
+      <!-- NAMA BERSAMA VEEMON GIF -->
+      <div class="hero-name-container">
+        <h1 class="hero-title" style="margin-bottom: 0;">AIMAN<br>ASMAN</h1>
+        <img src="vmonHOME.gif" alt="Veemon Partner" class="hero-veemon-gif" onerror="this.src='veemon.gif'">
+      </div>
+
+      <div class="hero-subtitle">&gt;Information Systems Specialist</div>
+
+      <p style="font-size: 1.05rem; color: var(--neon-green); font-weight: 600; margin-bottom: 10px;">
+        👋 Feel free to know more about me! 🚀
+      </p>
+
+      <p class="hero-desc">
+        Architecting intelligent solutions at the intersection of <b>Information Systems</b>, 
+        <span>Telegram Smart Bots</span>, and <b>Database Automation</b>.
+      </p>
+      <div class="hero-actions">
+        <a href="#about-section" class="btn-cyan">EXPLORE SYSTEMS ↓</a>
+        <button class="btn-ghost" onclick="openTerminal()">LAUNCH TERMINAL 🕹</button>
+      </div>
+    </div>
+
+    <!-- Holographic Biometric ID Card -->
+    <div class="bio-card-wrapper">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <div class="bio-card">
+        <div class="bio-avatar-frame">
+          <img src="boyy.jpg" alt="Aiman Asman Profile Photo" class="bio-avatar-img">
+        </div>
+
+        <div class="bio-overlay-info">
+          <div class="bio-badge-box">
+            <div>
+              <span style="color:#64748b; display:block; font-size:0.65rem;">BIOMETRIC ID</span>
+              <span style="color:var(--neon-cyan);">AIMAN_ASMAN.RAW</span>
+            </div>
+            <span style="background:rgba(0,255,102,0.15); color:var(--neon-green); padding:3px 8px; border-radius:3px;">AUTHENTICATED</span>
+          </div>
+
+          <div class="bio-footer-meta">
+            <span>UITM • CAMPUS SAMARAHAN</span>
+            <span>SEC_LEVEL: 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM METRICS STAT RIBBON -->
+  <section class="metrics-ribbon">
+    <div class="metric-card">
+      <div class="metric-label">CURRENT INSTITUTION</div>
+      <div class="metric-value">UiTM Samarahan</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">MAJOR &amp; STANDING</div>
+      <div class="metric-value cyan">CDIM110 (Sem 5)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">CURRENT CGPA</div>
+      <div class="metric-value">3.28 / 4.00</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">AVAILABILITY</div>
+      <div class="metric-value green">Open for Projects</div>
+    </div>
+  </section>
+
+  <!-- ACADEMIC CURRICULUM SECTION -->
+  <main class="container" id="about-section">
+    <h2>Academic &amp; Technical Mission</h2>
+    <hr>
+    
+    <p>
+      Welcome to the central node of my personal website, created specifically for the 
+      <abbr title="Introduction to Web Content Management & Design">IMD318</abbr> individual project (<b>AimanFik_PersonalWeb</b>). 
+      This site documents my credentials, projects, and records within the 
+      <b>Faculty of Information Science</b> at <i>Universiti Teknologi MARA (UiTM), Kampus Samarahan</i>.
+    </p>
+
+    <section class="highlight-box">
+      <h3>System Specification Overview</h3>
+      <p>
+        <b>Curricular Unit:</b> IMD 318<sup>(30% Project Assessment)</sup> | 
+        <b>Academic Level:</b> Semester <sub>5</sub> | 
+        <b>Faculty Node:</b> <abbr title="Universiti Teknologi MARA">UiTM</abbr>
+      </p>
+      <pre>
+[SYSTEM_SPECS]
+Author Name   : Aiman Asman
+Student ID    : 2024647386
+Current Level : Semester 5 (CGPA: 3.28)
+Program       : CDIM110 - Diploma in Information Management
+Interface     : Cyber HUD Glassmorphism
+Coding Tools  : Text-based Authoring (Notepad)
+Host Status   : Ready for GitHub Deployment (AimanFik_PersonalWeb)
+      </pre>
+    </section>
+
+    <h3>Affiliated External Portals</h3>
+    <ul>
+      <li>
+        <a href="https://www.uitm.edu.my" target="_blank" style="color:var(--neon-cyan);">
+          Universiti Teknologi MARA Official Portal (External Link) ↗
+        </a>
+      </li>
+      <li>
+        <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" style="color:var(--neon-cyan);">
+          W3Schools Web Reference ↗
+        </a>
+      </li>
+    </ul>
+
+    <!-- DIRECT CONTACT & SHORTCUT DISPATCH HUB -->
+    <h3 style="margin-top: 35px; color: var(--neon-cyan);">Direct Transmission Channels</h3>
+    <p style="color: var(--text-muted);">
+      Establish direct communication via encrypted protocols or immediate messaging shortcuts:
+    </p>
+
+    <div class="contact-grid">
+      <!-- 1. WhatsApp Shortcut -->
+      <a href="https://wa.me/60198193560?text=Hello%20Aiman,%20I%20am%20contacting%20you%20from%20your%20IMD318%20website" target="_blank" class="contact-card whatsapp">
+        <div class="contact-icon">💬</div>
+        <div class="contact-info">
+          <span class="contact-type">WHATSAPP SHORTCUT</span>
+          <span class="contact-val">+60 19-819 3560</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+
+      <!-- 2. Telegram Shortcut -->
+      <a href="https://t.me/+60198193560" target="_blank" class="contact-card telegram">
+        <div class="contact-icon">✈️</div>
+        <div class="contact-info">
+          <span class="contact-type">TELEGRAM DIRECT</span>
+          <span class="contact-val">@aimanfik4647 / Chat</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+
+      <!-- 3. Direct Phone Call -->
+      <a href="tel:+60198193560" class="contact-card phone">
+        <div class="contact-icon">📞</div>
+        <div class="contact-info">
+          <span class="contact-type">DIRECT CALL</span>
+          <span class="contact-val">+60 19-819 3560</span>
+        </div>
+        <span class="contact-arrow">📞</span>
+      </a>
+
+      <!-- 4. Email Direct -->
+      <a href="mailto:aimanfik4647@gmail.com?subject=Inquiry%20from%20IMD318%20Website" class="contact-card email">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-info">
+          <span class="contact-type">ELECTRONIC MAIL</span>
+          <span class="contact-val">aimanfik4647@gmail.com</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+
+      <!-- 5. Facebook Profile -->
+      <a href="https://www.facebook.com/share/19Co9NtHkg/?mibextid=wwXIfr" target="_blank" class="contact-card facebook">
+        <div class="contact-icon">📘</div>
+        <div class="contact-info">
+          <span class="contact-type">FACEBOOK PROFILE</span>
+          <span class="contact-val">Aiman Asman</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+
+      <!-- 6. TikTok Profile -->
+      <a href="https://www.tiktok.com/@boystillsleeping?_r=1&_t=ZS-9APOy3oZr6b" target="_blank" class="contact-card tiktok">
+        <div class="contact-icon">🎵</div>
+        <div class="contact-info">
+          <span class="contact-type">TIKTOK CHANNEL</span>
+          <span class="contact-val">@boystillsleeping</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+
+      <!-- 7. Instagram Profile -->
+      <a href="https://www.instagram.com/boystillsleeping?exln=YzFvOTJ3OTlzdWl1&utm_source=qr" target="_blank" class="contact-card instagram">
+        <div class="contact-icon">📸</div>
+        <div class="contact-info">
+          <span class="contact-type">INSTAGRAM PROFILE</span>
+          <span class="contact-val">@boystillsleeping</span>
+        </div>
+        <span class="contact-arrow">↗</span>
+      </a>
+    </div>
+
+    <br>
+    <a href="#top" class="hud-btn">↑ Return to Top</a>
+  </main>
+
+  <!-- CYBER TERMINAL & MINI-GAME MODAL -->
+  <div id="terminal-modal" class="terminal-overlay">
+    <div class="terminal-window">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot red" onclick="closeTerminal()" title="Close Terminal"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-user">aiman@cyber-core:~</span>
+        </div>
+        <div class="terminal-ver">BASH 5.2.15</div>
+      </div>
+
+      <div class="terminal-body" id="terminal-output">
+        <div class="sys-banner">
+          CYBER OS v4.2 // INITIALIZED FOR AIMAN ASMAN<br>
+          Type <span class="cmd-hl">help</span> to view commands, <span class="cmd-green">vmon</span> to play Digimon Adventure, or <span class="cmd-hl">game</span> for classic arcade.
+        </div>
+        <div class="terminal-divider"></div>
+      </div>
+
+      <!-- Playable Canvas Mini-Game -->
+      <div id="arcade-container" style="display: none;">
+        <div class="game-hud">
+          <span id="game-title-hud" style="color: var(--neon-cyan); font-weight: bold;">GAME: ARCADE</span>
+          <span>SCORE: <span id="game-score">0</span></span>
+          <span>HIGH: <span id="game-high">0</span></span>
+          <span style="color: #64748b;">[A/D or ←/→ to Move | ESC to Exit]</span>
+        </div>
+        <canvas id="game-canvas" width="600" height="260"></canvas>
+      </div>
+
+      <div class="terminal-input-row" id="term-input-container">
+        <span class="prompt-tag">guest@aiman:~$</span>
+        <input type="text" id="terminal-input" placeholder="Type 'vmon', 'game' or 'help'..." autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This website was authored and developed by 
+      <strong>Aiman Bin Asman</strong> for <strong>IMD318: Individual Project</strong>. 
+      All contents are managed and verified for academic evaluation.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       CYBER BOOT LOADER ENGINE (SUPER FAST & SMOOTH ~0.6s)
+       ======================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      const loader = document.getElementById('cyber-loader');
+      const progress = document.getElementById('loader-progress');
+      const percentTxt = document.getElementById('loader-percent');
+      const statusTxt = document.getElementById('loader-status');
+      
+      let count = 0;
+      const stages = [
+        "BOOTING emann.SYS KERNEL...",
+        "INITIALIZING DIGI-PARTNER ROUTINE...",
+        "AUTHENTICATING BIOMETRIC ID...",
+        "SYSTEM READY & ONLINE"
+      ];
+
+      // Selang 18ms dengan lompatan peratusan pantas
+      const bootTimer = setInterval(() => {
+        count += Math.floor(Math.random() * 12) + 10;
+        if (count > 100) count = 100;
+        
+        progress.style.width = `${count}%`;
+        percentTxt.innerText = `${count}%`;
+
+        if (count < 30) statusTxt.innerText = stages[0];
+        else if (count < 65) statusTxt.innerText = stages[1];
+        else if (count < 95) statusTxt.innerText = stages[2];
+        else statusTxt.innerText = stages[3];
+
+        if (count === 100) {
+          clearInterval(bootTimer);
+          setTimeout(() => {
+            loader.classList.add('loaded');
+            if (typeof playCyberBeep === 'function') {
+              playCyberBeep(980, 0.08, 'sine');
+            }
+          }, 120);
+        }
+      }, 18);
+    });
+
+    // Live Clock Script
+    function updateClock() {
+      const now = new Date();
+      const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', opts);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Simulated Ping Telemetry
+    setInterval(() => {
+      const ping = Math.floor(Math.random() * 8) + 16;
+      document.getElementById('hud-ping-display').innerText = `PING: ${ping}ms`;
+    }, 3000);
+
+    // Particle Background Canvas
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      if (sfxEnabled) {
+        btn.innerText = '🔊 SFX: ON';
+        btn.style.borderColor = 'var(--neon-cyan)';
+        btn.style.color = 'var(--neon-cyan)';
+        playCyberBeep(880, 0.08);
+      } else {
+        btn.innerText = '🔇 SFX: OFF';
+        btn.style.borderColor = '#64748b';
+        btn.style.color = '#64748b';
+      }
+    }
+
+    function playCyberBeep(frequency = 600, duration = 0.06, type = 'sine') {
+      if (!sfxEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (err) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .metric-card, .bio-card, .contact-card').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+
+    /* ========================================================
+       TERMINAL & GAME ENGINES (CYBER DODGE & VEEMON RUNNER)
+       ======================================================== */
+    const termModal = document.getElementById('terminal-modal');
+    const termInput = document.getElementById('terminal-input');
+    const termOutput = document.getElementById('terminal-output');
+    const arcadeBox = document.getElementById('arcade-container');
+    const termInputRow = document.getElementById('term-input-container');
+    const gameTitleHud = document.getElementById('game-title-hud');
+
+    function openTerminal() {
+      termModal.style.display = 'flex';
+      termInput.focus();
+      playCyberBeep(700, 0.08);
+    }
+
+    function closeTerminal() {
+      termModal.style.display = 'none';
+      stopAnyGame();
+      playCyberBeep(350, 0.08);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && termModal.style.display === 'flex') {
+        closeTerminal();
+      }
+    });
+
+    termInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = termInput.value.trim().toLowerCase();
+        handleCommand(cmd);
+        termInput.value = '';
+      }
+    });
+
+    function printLine(text, color = '#e2e8f0') {
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.style.margin = '4px 0';
+      line.innerHTML = text;
+      termOutput.appendChild(line);
+      termOutput.scrollTop = termOutput.scrollHeight;
+    }
+
+    function handleCommand(cmd) {
+      printLine(`<span style="color:var(--neon-cyan)">guest@aiman:~$</span> ${cmd}`);
+      playCyberBeep(550, 0.04);
+
+      switch (cmd) {
+        case 'help':
+          printLine('Available Directives:', '#ffb800');
+          printLine('  <span style="color:var(--neon-cyan)">vmon</span> / <span style="color:var(--neon-cyan)">digimon</span> - Launch VEEMON CYBER ADVENTURE mini-game');
+          printLine('  <span style="color:var(--neon-green)">game</span>            - Launch classic arcade: CYBER DODGE');
+          printLine('  <span style="color:var(--neon-cyan)">about</span>           - Query credentials &amp; standing');
+          printLine('  <span style="color:var(--neon-cyan)">skills</span>          - List technical competencies');
+          printLine('  <span style="color:var(--neon-cyan)">clear</span>           - Clear terminal buffer');
+          printLine('  <span style="color:var(--neon-cyan)">exit</span>            - Terminate terminal session');
+          break;
+
+        case 'vmon':
+        case 'digimon':
+          printLine('Initializing Digital World: VEEMON CYBER ADVENTURE ...', 'var(--neon-cyan)');
+          startDigimonGame();
+          break;
+
+        case 'game':
+          printLine('Launching Classic Arcade Sub-routine: CYBER DODGE ...', 'var(--neon-green)');
+          startArcade();
+          break;
+
+        case 'about':
+          printLine('AUTHOR: Aiman Bin Asman');
+          printLine('NODE: UiTM Kampus Samarahan (Faculty of Information Science)');
+          printLine('STATUS: Semester 5 &bull; Current CGPA: 3.28');
+          printLine('INTERN: PPD Kota Marudu (Pasukan Teknikal ICT Sekolah)');
+          break;
+
+        case 'skills':
+          printLine('&bull; Front-End: HTML5, CSS3 Grid, JavaScript Canvas');
+          printLine('&bull; Database: PHP &amp; MySQL Structured Queries');
+          printLine('&bull; Automation: Telegram Smart Bot APIs (@ppdkmBot)');
+          printLine('&bull; Design: Canva Graphics &amp; CapCut Video Editing');
+          break;
+
+        case 'clear':
+          termOutput.innerHTML = `
+            <div class="sys-banner">
+              CYBER OS v4.2 // INITIALIZED FOR AIMAN ASMAN<br>
+              Type <span class="cmd-hl">help</span> to view commands, <span class="cmd-green">vmon</span> to play Digimon, or <span class="cmd-hl">game</span> for classic arcade.
+            </div>
+            <div class="terminal-divider"></div>
+          `;
+          break;
+
+        case 'exit':
+          closeTerminal();
+          break;
+
+        case '':
+          break;
+
+        default:
+          printLine(`Command not recognized: '${cmd}'. Type 'help' for available directives.`, '#f43f5e');
+          playCyberBeep(220, 0.12, 'sawtooth');
+      }
+    }
+
+    // SHARED GAME CANVAS LOGIC
+    let gCanvas = document.getElementById('game-canvas');
+    let gCtx = gCanvas.getContext('2d');
+    let gameLoopId = null;
+    let keys = {};
+    let activeGameType = null;
+
+    window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+    function stopAnyGame() {
+      arcadeBox.style.display = 'none';
+      termInputRow.style.display = 'flex';
+      cancelAnimationFrame(gameLoopId);
+      activeGameType = null;
+      termInput.focus();
+    }
+
+    /* ---------------- 1. CLASSIC CYBER DODGE ---------------- */
+    let player = { x: 280, y: 220, w: 26, h: 26, speed: 6 };
+    let obstacles = [];
+    let score = 0;
+    let highScore = 0;
+
+    function startArcade() {
+      stopAnyGame();
+      activeGameType = 'classic';
+      gameTitleHud.innerText = 'CYBER DODGE';
+      arcadeBox.style.display = 'block';
+      termInputRow.style.display = 'none';
+      score = 0;
+      obstacles = [];
+      player.x = gCanvas.width / 2 - 13;
+      document.getElementById('game-score').innerText = score;
+      playCyberBeep(800, 0.15);
+      gameLoop();
+    }
+
+    function gameLoop() {
+      if (activeGameType !== 'classic') return;
+
+      if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && player.x > 0) player.x -= player.speed;
+      if ((keys['ArrowRight'] || keys['d'] || keys['D']) && player.x + player.w < gCanvas.width) player.x += player.speed;
+
+      if (Math.random() < 0.05) {
+        obstacles.push({
+          x: Math.random() * (gCanvas.width - 20),
+          y: -15,
+          w: Math.random() * 25 + 15,
+          h: 12,
+          speed: Math.random() * 2.5 + 2.5
+        });
+      }
+
+      gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+
+      // Player Ship
+      gCtx.fillStyle = '#00f0ff';
+      gCtx.shadowColor = '#00f0ff';
+      gCtx.shadowBlur = 10;
+      gCtx.beginPath();
+      gCtx.moveTo(player.x + player.w / 2, player.y);
+      gCtx.lineTo(player.x, player.y + player.h);
+      gCtx.lineTo(player.x + player.w, player.y + player.h);
+      gCtx.closePath();
+      gCtx.fill();
+
+      // Obstacles
+      gCtx.fillStyle = '#bc13fe';
+      gCtx.shadowColor = '#bc13fe';
+      gCtx.shadowBlur = 8;
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        let obs = obstacles[i];
+        obs.y += obs.speed;
+        gCtx.fillRect(obs.x, obs.y, obs.w, obs.h);
+
+        if (
+          player.x < obs.x + obs.w &&
+          player.x + player.w > obs.x &&
+          player.y < obs.y + obs.h &&
+          player.y + player.h > obs.y
+        ) {
+          playCyberBeep(180, 0.3, 'sawtooth');
+          if (score > highScore) {
+            highScore = score;
+            document.getElementById('game-high').innerText = highScore;
+          }
+          printLine(`GAME OVER! Final Score: ${score}`, '#f43f5e');
+          stopAnyGame();
+          return;
+        }
+
+        if (obs.y > gCanvas.height) {
+          obstacles.splice(i, 1);
+          score += 10;
+          document.getElementById('game-score').innerText = score;
+          if (score % 50 === 0) playCyberBeep(900, 0.05);
+        }
+      }
+
+      gCtx.shadowBlur = 0;
+      gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    /* ---------------- 2. VEEMON CYBER ADVENTURE ---------------- */
+    let vmonSpriteImg = new Image();
+    vmonSpriteImg.src = 'vmonHOME.gif';
+
+    let dPlayer = { x: 270, y: 190, w: 50, h: 55, speed: 7 };
+    let digiItems = [];
+    let dScore = 0;
+    let dHighScore = 0;
+
+    function startDigimonGame() {
+      stopAnyGame();
+      activeGameType = 'vmon';
+      gameTitleHud.innerText = 'VEEMON CYBER ADVENTURE';
+      arcadeBox.style.display = 'block';
+      termInputRow.style.display = 'none';
+      dScore = 0;
+      digiItems = [];
+      dPlayer.x = gCanvas.width / 2 - 25;
+      document.getElementById('game-score').innerText = dScore;
+      playCyberBeep(880, 0.12, 'triangle');
+      digimonGameLoop();
+    }
+
+    function digimonGameLoop() {
+      if (activeGameType !== 'vmon') return;
+
+      if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && dPlayer.x > 0) dPlayer.x -= dPlayer.speed;
+      if ((keys['ArrowRight'] || keys['d'] || keys['D']) && dPlayer.x + dPlayer.w < gCanvas.width) dPlayer.x += dPlayer.speed;
+
+      // Hasilkan item baru (Data / Virus)
+      if (Math.random() < 0.055) {
+        digiItems.push({
+          x: Math.random() * (gCanvas.width - 30) + 15,
+          y: -20,
+          r: 9,
+          speed: Math.random() * 2 + 2.5,
+          isVirus: Math.random() < 0.38 // Merah = Virus (Elak), Hijau = Digi-Data (Kutip)
+        });
+      }
+
+      gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+
+      // Lukis Veemon
+      if (vmonSpriteImg.complete && vmonSpriteImg.naturalWidth !== 0) {
+        gCtx.drawImage(vmonSpriteImg, dPlayer.x, dPlayer.y, dPlayer.w, dPlayer.h);
+      } else {
+        gCtx.fillStyle = '#00f0ff';
+        gCtx.fillRect(dPlayer.x, dPlayer.y, dPlayer.w, dPlayer.h);
+      }
+
+      // Lukis item dan semak perlanggaran
+      for (let i = digiItems.length - 1; i >= 0; i--) {
+        let item = digiItems[i];
+        item.y += item.speed;
+
+        gCtx.beginPath();
+        gCtx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+        gCtx.fillStyle = item.isVirus ? '#ff0055' : '#00ff66';
+        gCtx.shadowColor = item.isVirus ? '#ff0055' : '#00ff66';
+        gCtx.shadowBlur = 10;
+        gCtx.fill();
+
+        // Hitbox perlanggaran dengan Veemon
+        if (
+          item.x > dPlayer.x &&
+          item.x < dPlayer.x + dPlayer.w &&
+          item.y > dPlayer.y &&
+          item.y < dPlayer.y + dPlayer.h
+        ) {
+          if (item.isVirus) {
+            // Kalah jika terkena virus
+            playCyberBeep(160, 0.35, 'sawtooth');
+            if (dScore > dHighScore) {
+              dHighScore = dScore;
+              document.getElementById('game-high').innerText = dHighScore;
+            }
+            printLine(`DIGI-SYSTEM CORRUPTED! Veemon EXP: ${dScore}`, '#f43f5e');
+            stopAnyGame();
+            return;
+          } else {
+            // Berjaya kutip data
+            playCyberBeep(920, 0.05, 'triangle');
+            dScore += 20;
+            document.getElementById('game-score').innerText = dScore;
+            digiItems.splice(i, 1);
+            continue;
+          }
+        }
+
+        // Buang item jika melepasi bahagian bawah kanvas
+        if (item.y > gCanvas.height + 20) {
+          digiItems.splice(i, 1);
+        }
+      }
+
+      gCtx.shadowBlur = 0;
+      gameLoopId = requestAnimationFrame(digimonGameLoop);
+    }
+  </script>
+</body>
+</html>

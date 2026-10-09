@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family - emann.SYS | IMD318</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= TERRIERMON PARTNER COMPONENT STYLES ================= */
+    .robot-section {
+      display: flex;
+      justify-content: center;
+      margin: 25px auto 35px;
+      width: 100%;
+    }
+
+    .robot-card {
+      position: relative;
+      background: rgba(4, 8, 20, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      width: 100%;
+      max-width: 520px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .terriermon-container {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .terriermon-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      animation: terriermonIdle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes terriermonIdle {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* Animasi apabila Terriermon bercakap / audio aktif */
+    .speaking .terriermon-img {
+      animation: terriermonBounce 0.35s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px var(--neon-cyan)) brightness(1.2);
+    }
+
+    @keyframes terriermonBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px) scale(1.08); }
+    }
+
+    .system-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 5px 0 10px;
+    }
+
+    .mouth-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 24px;
+      margin: 4px auto 14px;
+      width: 140px;
+    }
+
+    .mouth-viz span {
+      width: 4px;
+      height: 5px;
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .speaking .mouth-viz span {
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: soundWave 0.45s ease-in-out infinite alternate;
+    }
+
+    .speaking .mouth-viz span:nth-child(2) { animation-delay: 0.1s; }
+    .speaking .mouth-viz span:nth-child(3) { animation-delay: 0.2s; }
+    .speaking .mouth-viz span:nth-child(4) { animation-delay: 0.05s; }
+    .speaking .mouth-viz span:nth-child(5) { animation-delay: 0.25s; }
+    .speaking .mouth-viz span:nth-child(6) { animation-delay: 0.15s; }
+    .speaking .mouth-viz span:nth-child(7) { animation-delay: 0.3s; }
+    .speaking .mouth-viz span:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes soundWave {
+      0% { height: 4px; }
+      100% { height: 22px; }
+    }
+
+    .transcript-box {
+      background: #02050c;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      text-align: left;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .robot-btn {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .robot-btn:hover:not(:disabled) {
+      background: var(--neon-cyan);
+      color: #03060f;
+      box-shadow: 0 0 16px var(--neon-cyan);
+    }
+
+    .robot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body id="top">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Top Cyber HUD Header -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign"><span class="status-dot"></span> emann.SYS</div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+    <nav class="hud-nav">
+      <a href="index.html">00 // HOME</a>
+      <a href="biodata.html">01 // BIODATA</a>
+      <a href="education.html">02 // EDUCATION</a>
+      <a href="experience.html">03 // EXPERIENCE</a>
+      <a href="family.html" class="active">04 // FAMILY</a>
+      <a href="gallery.html">05 // GALLERY</a>
+    </nav>
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">🔊 SFX: ON</button>
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <main class="container" id="family-content" style="margin-top: 40px;">
+    <h2>04 // HOUSEHOLD DIRECTORY &amp; FAMILY ARCHIVES</h2>
+    <hr>
+
+    <p>
+      Honoring family roots and lineage. This page features an interactive 
+      <b>HTML Image Map</b> with coordinate navigation as specified in the 
+      <abbr title="Introduction to Web Content Management & Design">IMD318</abbr> curriculum, 
+      alongside a dynamic family moments slideshow archive.
+    </p>
+
+    <!-- ========================================================
+         TERRIERMON DIGITAL PARTNER AUDIO INTERFACE (FAMILY)
+         ======================================================== -->
+    <section class="robot-section">
+      <div class="robot-card" id="robotCard">
+        <div class="terriermon-container">
+          <img src="terriermon1.gif" alt="Terriermon Partner" class="terriermon-img" id="terriermonSprite" onerror="this.src='asmanfamily.jpg'">
+        </div>
+
+        <div class="system-title">TERRIERMON // HOUSEHOLD ARCHIVE</div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusLabel">Standby</span>
+        </div>
+
+        <!-- Audio Wave Visualizer Bars -->
+        <div class="mouth-viz">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Vocal Transcript Box -->
+        <div class="transcript-box" id="transcript">
+          "Momentai! Press 'Transmit Briefing' to hear the family introduction."
+        </div>
+
+        <div class="actions">
+          <button type="button" class="robot-btn" id="speakBtn" onclick="activateRobotSpeech()">Transmit Briefing</button>
+          <button type="button" class="robot-btn" id="stopBtn" onclick="haltRobotSpeech()" disabled>Silence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rubric: Complex Table (Rowspan & Colspan) -->
+    <h3 style="margin-top: 25px;">Household Registry</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Role / Kinship</th>
+          <th>Designation</th>
+          <th>Notes &amp; Responsibilities</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Father</b></td>
+          <td>Mr. Asman Bin Abd. Rahman</td>
+          <td>Primary School Teacher</td>
+        </tr>
+        <tr>
+          <td><b>Mother</b></td>
+          <td>Mrs. Anisah Bulah Abdullah</td>
+          <td>Primary School Teacher</td>
+        </tr>
+        <tr>
+          <td rowspan="3"><b>Siblings</b></td>
+          <td>Aiman (Self)</td>
+          <td>UiTM Undergraduate Student</td>
+        </tr>
+        <tr>
+          <td>Arlisa Najwa (Little Sister)</td>
+          <td>Secondary School Scholar</td>
+        </tr>
+        <tr>
+          <td>Azfar Akim (Little Brother)</td>
+          <td>Primary School Scholar</td>
+        </tr>
+        <tr>
+          <td><b>Family Base</b></td>
+          <td colspan="2" style="color:var(--neon-green); font-weight:600;">Kota Marudu &amp; Tawau, Sabah, Malaysia</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Rubric: HTML Image Map (<map> and <area>) (2 Marks) -->
+    <h3 style="margin-top: 30px;">1. Interactive Family Image Map</h3>
+    <p>
+      <i>Click directly on the interactive banner below: click the <b>left quadrant</b> for Parents, <b>center circle</b> to return Home, or <b>right quadrant</b> for Siblings.</i>
+    </p>
+
+    <div class="image-map-container">
+      <img src="asmanfamily.jpg" alt="Family Portrait Banner" usemap="#family-map">
+      
+      <map name="family-map">
+        <area shape="rect" coords="0,0,200,300" href="#parents-box" alt="Parents Section" title="Click for Parents Details">
+        <area shape="circle" coords="300,150,75" href="index.html" alt="Return Home" title="Click to Return Home">
+        <area shape="rect" coords="400,0,600,300" href="#siblings-box" alt="Siblings Section" title="Click for Siblings Details">
+      </map>
+    </div>
+
+    <!-- Targeted Anchor Sections -->
+    <div id="parents-box" class="highlight-box" style="margin-top: 25px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h4 style="color: var(--neon-cyan); margin: 0;">🛡️ Parents' Pillars &bull; Mr. Asman &amp; Mrs. Anisah</h4>
+        <span style="font-family: 'Fira Code', monospace; font-size: 0.72rem; color: var(--neon-green); background: rgba(0,255,102,0.1); padding: 2px 8px; border-radius: 3px;">ROLE: EDUCATORS</span>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 8px;">
+        As dedicated primary school educators, my parents instilled core principles of lifelong learning, discipline, and integrity throughout my tertiary education.
+      </p>
+      <a href="#family-content" style="font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--neon-cyan); text-decoration: none;">↑ Back to Image Map</a>
+    </div>
+
+    <div id="siblings-box" class="highlight-box" style="margin-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h4 style="color: var(--neon-purple); margin: 0;">🤝 Siblings Camaraderie &bull; Arlisa Najwa &amp; Azfar Akim</h4>
+        <span style="font-family: 'Fira Code', monospace; font-size: 0.72rem; color: var(--neon-cyan); background: rgba(0,240,255,0.1); padding: 2px 8px; border-radius: 3px;">STATUS: ACTIVE</span>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 8px;">
+        Mutual encouragement circle fostering digital creativity, school academic pursuits, and shared goals between secondary and primary school milestones.
+      </p>
+      <a href="#family-content" style="font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--neon-purple); text-decoration: none;">↑ Back to Image Map</a>
+    </div>
+
+    <!-- ========================================================
+         FAMILY MOMENTS SLIDESHOW
+         ======================================================== -->
+    <h3 style="margin-top: 40px;">2. Family Moments Visual Archive (Slideshow)</h3>
+    <p style="color: var(--text-muted);">
+      Archival reel showcasing family events, celebrations, and outdoor gatherings:
+    </p>
+
+    <section class="slideshow-wrapper">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <button class="slide-btn prev" onclick="changeSlide(-1)">❮</button>
+      <button class="slide-btn next" onclick="changeSlide(1)">❯</button>
+
+      <div class="slideshow-frame">
+        <div class="slide-item active">
+          <img src="fam1.jpg" alt="Family Event 1" onerror="this.src='asmanfamily.jpg'">
+        </div>
+        <div class="slide-item">
+          <img src="fam2.jpg" alt="Family Event 2" onerror="this.src='asmanfamily.jpg'">
+        </div>
+        <div class="slide-item">
+          <img src="fam3.jpg" alt="Family Event 3" onerror="this.src='asmanfamily.jpg'">
+        </div>
+      </div>
+
+      <div class="slide-controls">
+        <span id="slide-caption">FAMILY NODE: [01 / 03]</span>
+        <div class="slide-dots">
+          <span class="dot-indicator active" onclick="jumpToSlide(0)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(1)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(2)"></span>
+        </div>
+      </div>
+    </section>
+
+    <br>
+    <a href="#top" class="hud-btn">↑ Return to Top</a>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This page was produced and maintained by 
+      <strong>Aiman Bin Asman</strong> for the <strong>IMD318 Individual Project</strong>.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       TERRIERMON AUDIO AGENT CONTROLLER (terriermon.mp3)
+       ======================================================== */
+    const card = document.getElementById('robotCard');
+    const speakBtn = document.getElementById('speakBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusDot = document.getElementById('statusDot');
+    const transcript = document.getElementById('transcript');
+
+    // Memuatkan fail audio terriermon.mp3
+    const audio = new Audio('terriermon.mp3');
+    const dossierIntro = "Momentai, visitors! Terriermon reporting for family duty! Welcome to Aiman's warm and loving Household Registry! Behind every great Digital Tamer is an amazing team, and Aiman's family is pure heart! Both of his wonderful parents, Mr. Asman and Mrs. Anisah, are dedicated school teachers who guide with patience and wisdom! As the proud big brother, Aiman is joined by his awesome younger sister, Arlisa Najwa, and his energetic little brother, Azfar Akim! Rooted with love between Kota Marudu and Tawau, Sabah, they are his ultimate cheerleaders! Take a look at the registry below, and remember... Momentai!";
+
+    function activateRobotSpeech() {
+      playCyberBeep(700, 0.08, 'triangle');
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        card.classList.add('speaking');
+        statusLabel.innerText = "Transmitting Audio";
+        statusDot.style.background = "var(--neon-cyan)";
+        statusDot.style.boxShadow = "0 0 10px var(--neon-cyan)";
+        transcript.innerText = dossierIntro;
+        speakBtn.disabled = true;
+        stopBtn.disabled = false;
+      }).catch(err => {
+        transcript.innerText = "[ERROR]: Audio playback halted. Sila pastikan fail 'terriermon.mp3' berada dalam folder yang sama dengan family.html.";
+      });
+    }
+
+    function haltRobotSpeech() {
+      playCyberBeep(350, 0.06, 'sawtooth');
+      audio.pause();
+      audio.currentTime = 0;
+      resetState();
+    }
+
+    audio.onended = resetState;
+
+    function resetState() {
+      card.classList.remove('speaking');
+      statusLabel.innerText = "Standby";
+      statusDot.style.background = "var(--neon-green)";
+      statusDot.style.boxShadow = "0 0 8px var(--neon-green)";
+      speakBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    /* ========================================================
+       LIVE CLOCK & TELEMETRY
+       ======================================================== */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateClock, 1000); updateClock();
+    setInterval(() => {
+      document.getElementById('hud-ping-display').innerText = `PING: ${Math.floor(Math.random() * 8) + 16}ms`;
+    }, 3000);
+
+    /* ========================================================
+       PARTICLE CANVAS BACKGROUND
+       ======================================================== */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+      }
+    }
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      if (sfxEnabled) {
+        btn.innerText = '🔊 SFX: ON';
+        btn.style.borderColor = 'var(--neon-cyan)';
+        btn.style.color = 'var(--neon-cyan)';
+        playCyberBeep(880, 0.08);
+      } else {
+        btn.innerText = '🔇 SFX: OFF';
+        btn.style.borderColor = '#64748b';
+        btn.style.color = '#64748b';
+      }
+    }
+
+    function playCyberBeep(frequency = 600, duration = 0.06, type = 'sine') {
+      if (!sfxEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (err) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .custom-table tr, area, .slide-btn, .dot-indicator').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+
+    /* ========================================================
+       SLIDESHOW CONTROLLER LOGIC
+       ======================================================== */
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-item');
+    const dots = document.querySelectorAll('.dot-indicator');
+    const caption = document.getElementById('slide-caption');
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+
+      if (caption) {
+        caption.innerText = `FAMILY NODE: [0${currentSlide + 1} / 0${slides.length}]`;
+      }
+    }
+
+    function changeSlide(direction) {
+      playCyberBeep(650, 0.05);
+      showSlide(currentSlide + direction);
+    }
+
+    function jumpToSlide(index) {
+      playCyberBeep(750, 0.05);
+      showSlide(index);
+    }
+
+    setInterval(() => {
+      showSlide(currentSlide + 1);
+    }, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Education - emann.SYS | IMD318</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ================= VEEMON PARTNER COMPONENT STYLES ================= */
+    .robot-section {
+      display: flex;
+      justify-content: center;
+      margin: 25px auto 35px;
+      width: 100%;
+    }
+
+    .robot-card {
+      position: relative;
+      background: rgba(4, 8, 20, 0.95);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      width: 100%;
+      max-width: 520px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .veemon-container {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .veemon-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      animation: veemonIdle 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes veemonIdle {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* Animasi apabila Veemon sedang bercakap / audio aktif */
+    .speaking .veemon-img {
+      animation: veemonTalkBounce 0.35s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px var(--neon-cyan)) brightness(1.2);
+    }
+
+    @keyframes veemonTalkBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px) scale(1.08); }
+    }
+
+    .system-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 5px 0 10px;
+    }
+
+    .mouth-viz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 24px;
+      margin: 4px auto 14px;
+      width: 140px;
+    }
+
+    .mouth-viz span {
+      width: 4px;
+      height: 5px;
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .speaking .mouth-viz span {
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: soundWave 0.45s ease-in-out infinite alternate;
+    }
+
+    .speaking .mouth-viz span:nth-child(2) { animation-delay: 0.1s; }
+    .speaking .mouth-viz span:nth-child(3) { animation-delay: 0.2s; }
+    .speaking .mouth-viz span:nth-child(4) { animation-delay: 0.05s; }
+    .speaking .mouth-viz span:nth-child(5) { animation-delay: 0.25s; }
+    .speaking .mouth-viz span:nth-child(6) { animation-delay: 0.15s; }
+    .speaking .mouth-viz span:nth-child(7) { animation-delay: 0.3s; }
+    .speaking .mouth-viz span:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes soundWave {
+      0% { height: 4px; }
+      100% { height: 22px; }
+    }
+
+    .transcript-box {
+      background: #02050c;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      text-align: left;
+      min-height: 70px;
+      margin-bottom: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .robot-btn {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+    }
+
+    .robot-btn:hover:not(:disabled) {
+      background: var(--neon-cyan);
+      color: #03060f;
+      box-shadow: 0 0 16px var(--neon-cyan);
+    }
+
+    .robot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body id="top">
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Top Cyber HUD Header -->
+  <header class="cyber-hud">
+    <div class="hud-left">
+      <div class="hud-callsign"><span class="status-dot"></span> emann.SYS</div>
+      <span class="hud-badge">STATUS: ONLINE</span>
+      <span class="hud-ping" id="hud-ping-display">PING: 18ms</span>
+    </div>
+    <nav class="hud-nav">
+      <a href="index.html">00 // HOME</a>
+      <a href="biodata.html">01 // BIODATA</a>
+      <a href="education.html" class="active">02 // EDUCATION</a>
+      <a href="experience.html">03 // EXPERIENCE</a>
+      <a href="family.html">04 // FAMILY</a>
+      <a href="gallery.html">05 // GALLERY</a>
+    </nav>
+    <div class="hud-right">
+      <button id="sfx-toggle-btn" class="hud-btn" onclick="toggleSFX()" style="cursor: pointer;">🔊 SFX: ON</button>
+      <span id="live-clock" style="color: #64748b;">LOADING...</span>
+    </div>
+  </header>
+
+  <main class="container" id="edu-content" style="margin-top: 40px;">
+    <h2>02 // ACADEMIC ROADMAP &amp; QUALIFICATIONS</h2>
+    <hr>
+
+    <p>
+      Formal educational timeline documenting progression through primary school, secondary education 
+      in Kota Marudu, and tertiary diploma studies at <abbr title="Universiti Teknologi MARA">UiTM</abbr>.
+    </p>
+
+    <!-- ========================================================
+         VEEMON DIGITAL PARTNER AUDIO INTERFACE (EDUCATION)
+         ======================================================== -->
+    <section class="robot-section">
+      <div class="robot-card" id="robotCard">
+        <div class="veemon-container">
+          <img src="veemon.gif" alt="Veemon Partner" class="veemon-img" id="veemonSprite">
+        </div>
+
+        <div class="system-title">V-MON // EDUCATION ARCHIVE</div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusLabel">Standby</span>
+        </div>
+
+        <!-- Audio Wave Visualizer Bars -->
+        <div class="mouth-viz">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- Vocal Transcript Box -->
+        <div class="transcript-box" id="transcript">
+          "System ready. Press 'Transmit Briefing' to begin educational audio telemetry."
+        </div>
+
+        <div class="actions">
+          <button type="button" class="robot-btn" id="speakBtn" onclick="activateRobotSpeech()">Transmit Briefing</button>
+          <button type="button" class="robot-btn" id="stopBtn" onclick="haltRobotSpeech()" disabled>Silence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         CYBER EDUCATION SLIDESHOW (SK, SMK & UITM)
+         ======================================================== -->
+    <h3 style="margin-top: 25px;">Institutional Milestones Visual Reel</h3>
+    <section class="slideshow-wrapper">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+
+      <button class="slide-btn prev" onclick="changeSlide(-1)">❮</button>
+      <button class="slide-btn next" onclick="changeSlide(1)">❯</button>
+
+      <div class="slideshow-frame">
+        <!-- Slide 1: SK Temuno Teringai Darat -->
+        <div class="slide-item active">
+          <img src="edu-sk.jpg" alt="SK Temuno Teringai Darat Evidence">
+        </div>
+        <!-- Slide 2: SMK Bengkongan -->
+        <div class="slide-item">
+          <img src="edu-smk.jpg" alt="SMK Bengkongan Evidence">
+        </div>
+        <!-- Slide 3: UiTM Kampus Samarahan -->
+        <div class="slide-item">
+          <img src="edu-uitm.jpg" alt="UiTM Kampus Samarahan Evidence">
+        </div>
+      </div>
+
+      <div class="slide-controls">
+        <span id="slide-caption">ACADEMIC NODE: [01 / 03] &bull; SK. TEMUNO TERINGAI DARAT</span>
+        <div class="slide-dots">
+          <span class="dot-indicator active" onclick="jumpToSlide(0)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(1)"></span>
+          <span class="dot-indicator" onclick="jumpToSlide(2)"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rubric Item 5: Complex Table (Colspan & Rowspan) -->
+    <h3 style="margin-top: 30px;">Institutional Progression Matrix</h3>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Timeline</th>
+          <th>Qualification / Program</th>
+          <th>Institution Name</th>
+          <th>Academic Standing &amp; Honors</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>2024 &ndash; Present</b></td>
+          <td><b>Diploma in Information Management (CDIM110)</b></td>
+          <td>Universiti Teknologi MARA (UiTM), Kampus Samarahan</td>
+          <td style="color:var(--neon-green);"><b>Semester 5 &bull; Current CGPA: 3.28</b></td>
+        </tr>
+        <tr>
+          <td><b>2019 &ndash; 2023</b></td>
+          <td><b>Sijil Pelajaran Malaysia (SPM)</b></td>
+          <td>SMK. Bengkongan, Kota Marudu, Sabah</td>
+          <td>Awarded Subject Excellence Award for Bahasa Melayu (SPM 2023)</td>
+        </tr>
+        <tr>
+          <td><b>2013 &ndash; 2018</b></td>
+          <td><b>Primary Education (UPSR)</b></td>
+          <td>SK. Temuno Teringai Darat, Kota Marudu</td>
+          <td>President of Scouts Association &bull; Class Representative (2018)</td>
+        </tr>
+        <tr>
+          <td colspan="4" style="background: rgba(0, 240, 255, 0.05); text-align: center; color: var(--neon-cyan);">
+            <i>All certifications, exam grades, and cumulative CGPA verified under UiTM academic registry.</i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Rubric Item 1: Sub/Superscript, Preformatted, and Abbreviation Tags -->
+    <section class="highlight-box">
+      <h3>Curriculum Specialization</h3>
+      <p>
+        Currently enrolled in <b>Semester <sub>5</sub></b> core technical modules including 
+        <b>IMD318</b><sup>(Web Content Management &amp; Design)</sup>, database administration with 
+        <b>SQL</b><sub>structured queries</sub>, and digital preservation under the 
+        <abbr title="Faculty of Information Science">Faculty of Information Science</abbr>.
+      </p>
+      <pre>
+[CURRENT_ACADEMIC_AUDIT]
+Institution   : Universiti Teknologi MARA, Kampus Samarahan
+Program Code  : CDIM110 (Diploma in Information Management)
+Academic Level: Semester 5
+Cumulative GPA: 3.28 / 4.00
+Status        : Active &bull; In Good Standing
+      </pre>
+    </section>
+
+    <h3 style="margin-top: 25px;">Core Coursework Focus</h3>
+    <ol>
+      <li>Web Content Management Systems &amp; Front-End Architecture</li>
+      <li>Database Design, Relational Normalization &amp; Information Retrieval</li>
+      <li>Records Classification, Metadata Tagging &amp; Digital Preservation</li>
+      <li>Information Systems Management and Ethics in Data Distribution</li>
+    </ol>
+
+    <br>
+    <a href="#top" class="hud-btn">↑ Return to Top</a>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Statement of Ownership:</strong> This educational record was prepared by 
+      <strong>Aiman Bin Asman</strong> for the <strong>IMD318 Individual Project</strong>. 
+      Content represents authentic academic progression at Universiti Teknologi MARA.
+    </p>
+    <p>&copy; 2026 Universiti Teknologi MARA (UiTM). All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    /* ========================================================
+       VEEMON AUDIO AGENT CONTROLLER (vmonEdu.mp3)
+       ======================================================== */
+    const card = document.getElementById('robotCard');
+    const speakBtn = document.getElementById('speakBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusDot = document.getElementById('statusDot');
+    const transcript = document.getElementById('transcript');
+
+    // Memuatkan fail audio vmonEdu.mp3
+    const audio = new Audio('vmonEdu.mp3');
+    const dossierIntro = "Yahoo! Welcome to Aiman's Academic Training Grounds! I'm Veemon, and I've been cheering for him since day one! From mastering the basics in school to conquering his diploma at Universiti Teknologi MARA, he's always grinding and unlocking new digital skills! Check out his study quests, achievements, and educational journey down below! Let's go!";
+
+    function activateRobotSpeech() {
+      playCyberBeep(700, 0.08, 'triangle');
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        card.classList.add('speaking');
+        statusLabel.innerText = "Transmitting Audio";
+        statusDot.style.background = "var(--neon-cyan)";
+        statusDot.style.boxShadow = "0 0 10px var(--neon-cyan)";
+        transcript.innerText = dossierIntro;
+        speakBtn.disabled = true;
+        stopBtn.disabled = false;
+      }).catch(err => {
+        transcript.innerText = "[ERROR]: Audio playback halted. Sila pastikan fail 'vmonEdu.mp3' berada dalam folder yang sama dengan education.html.";
+      });
+    }
+
+    function haltRobotSpeech() {
+      playCyberBeep(350, 0.06, 'sawtooth');
+      audio.pause();
+      audio.currentTime = 0;
+      resetState();
+    }
+
+    audio.onended = resetState;
+
+    function resetState() {
+      card.classList.remove('speaking');
+      statusLabel.innerText = "Standby";
+      statusDot.style.background = "var(--neon-green)";
+      statusDot.style.boxShadow = "0 0 8px var(--neon-green)";
+      speakBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    // Live Clock Script
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateClock, 1000); 
+    updateClock();
+
+    // Simulated Ping Telemetry
+    setInterval(() => {
+      document.getElementById('hud-ping-display').innerText = `PING: ${Math.floor(Math.random() * 8) + 16}ms`;
+    }, 3000);
+
+    // Particle Canvas Background
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); 
+    resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.5 + 0.8;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; ctx.fill();
+      }
+    }
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(); particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath(); ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.6; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ========================================================
+       CYBER SYNTHESIZER SFX ENGINE (Web Audio API)
+       ======================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfx-toggle-btn');
+      btn.innerText = sfxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+      btn.style.color = sfxEnabled ? 'var(--neon-cyan)' : '#64748b';
+      if (sfxEnabled) playCyberBeep(880, 0.08);
+    }
+    function playCyberBeep(f=600, d=0.06, t='sine') {
+      if (!sfxEnabled) return;
+      try {
+        const c = getAudioContext(), o = c.createOscillator(), g = c.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, c.currentTime);
+        g.gain.setValueAtTime(0.08, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + d);
+        o.connect(g); g.connect(c.destination);
+        o.start(); o.stop(c.currentTime + d);
+      } catch(e){}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a, button, .slide-btn, .dot-indicator').forEach(el => {
+        el.addEventListener('mouseenter', () => playCyberBeep(950, 0.04, 'triangle'));
+        el.addEventListener('click', () => playCyberBeep(440, 0.08, 'sine'));
+      });
+    });
+
+    /* ========================================================
+       SLIDESHOW CONTROLLER (ERA LABELS: SK, SMK, UITM)
+       ======================================================== */
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-item');
+    const dots = document.querySelectorAll('.dot-indicator');
+    const caption = document.getElementById('slide-caption');
+    const labels = [
+      'ACADEMIC NODE: [01 / 03] &bull; SK. TEMUNO TERINGAI DARAT',
+      'ACADEMIC NODE: [02 / 03] &bull; SMK. BENGKONGAN',
+      'ACADEMIC NODE: [03 / 03] &bull; UITM KAMPUS SAMARAHAN'
+    ];
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+
+      if (caption) {
+        caption.innerHTML = labels[currentSlide];
+      }
+    }
+
+    function changeSlide(direction) {
+      playCyberBeep(650, 0.05);
+      showSlide(currentSlide + direction);
+    }
+
+    function jumpToSlide(index) {
+      playCyberBeep(750, 0.05);
+      showSlide(index);
+    }
+
+    setInterval(() => {
+      showSlide(currentSlide + 1);
+    }, 5000);
+  </script>
+</body>
+</html>
